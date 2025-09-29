@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - Blink Archive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #000000;
+            padding: 50px;
+            border-radius: 0;
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #666666;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #000000;
+        }
+
+        .price-info {
+            font-size: 0.8rem;
+            color: #666666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 16px;
+            background: #ffffff;
+            border: 2px solid #000000;
+            color: #000000;
+            font-family: inherit;
+            border-radius: 0;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            background: #f8f8f8;
+            box-shadow: 4px 4px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: #000000;
+            color: #ffffff;
+            border: 2px solid #000000;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 6px 6px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        button:active {
+            transform: translate(0px, 0px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        button:disabled {
+            background: #cccccc;
+            border-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .message {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 0;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            border: 2px solid;
+        }
+
+        .success {
+            background: #f0f0f0;
+            border-color: #000000;
+            color: #000000;
+            display: block;
+        }
+
+        .error {
+            background: #f0f0f0;
+            border-color: #000000;
+            color: #000000;
+            display: block;
+        }
+
+        .loading {
+            color: #000000;
+            text-align: center;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: none;
+            margin-top: 20px;
+        }
+
+        .loading-data {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #000000;
+            background: #f8f8f8;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000000;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .currency-price-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .existing-products {
+            margin-top: 40px;
+            border-top: 2px solid #000000;
+            padding-top: 30px;
+        }
+
+        .product-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #000000;
+            padding: 0;
+        }
+
+        .product-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: #666666;
+            font-size: 0.9rem;
+        }
+
+        .no-products {
+            padding: 30px;
+            text-align: center;
+            color: #666666;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 0 10px;
+            }
+            
+            .currency-price-group {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .required::after {
+            content: " *";
+            color: #000000;
+        }
+
+        .price-limit {
+            color: #ff4444;
+            font-weight: 600;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Blink Archive</h1>
+            <div class="subtitle">Admin Portal - Add Product</div>
+        </div>
+        
+        <form id="productForm">
+            <div class="form-group">
+                <label for="productName" class="required">Product Name</label>
+                <input type="text" id="productName" required placeholder="Enter product name">
+            </div>
+
+            <div class="form-group">
+                <label for="productDescription" class="required">Product Description</label>
+                <textarea id="productDescription" required placeholder="Describe the product features and contents"></textarea>
+            </div>
+
+            <div class="currency-price-group">
+                <div class="form-group">
+                    <label for="productPrice" class="required">Price (BTC)</label>
+                    <input type="number" id="productPrice" step="0.0000001" min="0.0000088" required placeholder="0.0000088" value="0.0000088">
+                    <div class="price-info">Minimum price: <span class="price-limit">0.0000088 BTC</span></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="productCurrency" class="required">Currency</label>
+                    <select id="productCurrency" required>
+                        <option value="BTC">BTC</option>
+                        <option value="USD">USD</option>
+                        <option value="ETH">ETH</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="downloadLink" class="required">Mega Download Link</label>
+                <input type="url" id="downloadLink" required placeholder="https://mega.nz/file/...">
+            </div>
+
+            <button type="submit" id="submitBtn">
+                Add Product to Archive
+            </button>
+        </form>
+
+        <div id="loadingMessage" class="loading">Processing...</div>
+        <div id="message" class="message"></div>
+
+        <!-- Loading Existing Products -->
+        <div id="loadingData" class="loading-data">
+            <div class="spinner"></div>
+            <span>Loading existing products...</span>
+        </div>
+
+        <!-- Existing Products Section -->
+        <div class="existing-products">
+            <h3>Existing Products</h3>
+            <div id="productList" class="product-list">
+                <div class="no-products">No products found</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzhfXHrY48d2DhlWwhSTxMHl04USLjtz0",
+            authDomain: "blink-archive.firebaseapp.com",
+            projectId: "blink-archive",
+            storageBucket: "blink-archive.firebasestorage.app",
+            messagingSenderId: "524384519627",
+            appId: "1:524384519627:web:10fc00ae09ce91a573a24e",
+            measurementId: "G-3C18W3NH1V"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Set default price to minimum limit
+        document.getElementById('productPrice').value = '0.0000088';
+
+        // Price validation - MINIMUM price
+        document.getElementById('productPrice').addEventListener('input', function(e) {
+            const minPrice = 0.0000088;
+            let value = parseFloat(e.target.value);
+            
+            if (value < minPrice) {
+                e.target.value = minPrice;
+                showMessage(`Price cannot be less than ${minPrice} BTC`, 'error');
+            }
+        });
+
+        // Load existing products
+        async function loadExistingProducts() {
+            const loadingData = document.getElementById('loadingData');
+            const productList = document.getElementById('productList');
+            
+            try {
+                loadingData.style.display = 'flex';
+                productList.innerHTML = '';
+
+                const q = query(collection(db, "products"), orderBy("created_at", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    productList.innerHTML = '<div class="no-products">No products found in database</div>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const product = doc.data();
+                    const productItem = document.createElement('div');
+                    productItem.className = 'product-item';
+                    productItem.innerHTML = `
+                        <div class="product-info">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-price">${product.price} ${product.currency}</div>
+                        </div>
+                        <div class="product-actions">
+                            <small>${doc.id.slice(0, 8)}...</small>
+                        </div>
+                    `;
+                    productList.appendChild(productItem);
+                });
+
+            } catch (error) {
+                console.error('Error loading products:', error);
+                productList.innerHTML = '<div class="no-products">Error loading products</div>';
+            } finally {
+                loadingData.style.display = 'none';
+            }
+        }
+
+        // Show message function
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `<strong>${type === 'success' ? 'Success' : 'Error'}</strong><br>${text}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Form handling
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const messageDiv = document.getElementById('message');
+            
+            // Get form values
+            const name = document.getElementById('productName').value;
+            const description = document.getElementById('productDescription').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const currency = document.getElementById('productCurrency').value;
+            const downloadLink = document.getElementById('downloadLink').value;
+
+            // Validate MINIMUM price limit
+            if (price < 0.0000088) {
+                showMessage('Price cannot be less than 0.0000088 BTC', 'error');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding Product...';
+            loadingMessage.style.display = 'block';
+            messageDiv.style.display = 'none';
+
+            try {
+                // Add product to Firestore
+                const docRef = await addDoc(collection(db, "products"), {
+                    name: name,
+                    description: description,
+                    price: price,
+                    currency: currency,
+                    download_link: downloadLink,
+                    created_at: new Date()
+                });
+
+                // Success message
+                showMessage(`"${name}" has been added to the archive. Document ID: ${docRef.id}`, 'success');
+                
+                // Reset form and reload products
+                document.getElementById('productForm').reset();
+                document.getElementById('productPrice').value = '0.0000088'; // Reset to minimum price
+                loadExistingProducts();
+                
+            } catch (error) {
+                console.error('Error adding product:', error);
+                showMessage(`Error adding product: ${error.message}`, 'error');
+            } finally {
+                // Reset loading state
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Product to Archive';
+                loadingMessage.style.display = 'none';
+            }
+        });
+
+        // Add subtle interactions
+        document.querySelectorAll('input, textarea, select').forEach(element => {
+            element.addEventListener('mouseenter', function() {
+                this.style.transform = 'translate(-1px, -1px)';
+                this.style.boxShadow = '2px 2px 0px #000000';
+            });
+            
+            element.addEventListener('mouseleave', function() {
+                if (document.activeElement !== this) {
+                    this.style.transform = 'translate(0px, 0px)';
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+
+        // Load existing products when page loads
+        document.addEventListener('DOMContentLoaded', loadExistingProducts);
+    </script>
+</body>
+</html>
