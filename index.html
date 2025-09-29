@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blink Archive - Digital Artifact Repository</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: #000000;
+            color: #ffffff;
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #333;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .search-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 2px solid #333;
+            padding: 8px 15px;
+            border-radius: 0;
+            width: 400px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: #000000;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            padding: 5px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            color: #000000;
+            cursor: pointer;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-btn {
+            padding: 8px 16px;
+            border: 1px solid #ffffff;
+            background: transparent;
+            color: #ffffff;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .main-container {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+            color: #ffffff;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .stats-bar {
+            background: #333;
+            color: #ffffff;
+            padding: 20px 0;
+            border-bottom: 1px solid #444;
+        }
+
+        .stats-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00ff00;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .collections-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .collections-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .collection-card {
+            border: 2px solid #000000;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .collection-card:hover {
+            box-shadow: 8px 8px 0px #000000;
+            transform: translate(-4px, -4px);
+        }
+
+        .collection-image {
+            width: 100%;
+            height: 200px;
+            background: #f0f0f0;
+            border-bottom: 2px solid #000000;
+            overflow: hidden;
+        }
+
+        .collection-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .collection-card:hover .collection-image img {
+            transform: scale(1.05);
+        }
+
+        .collection-content {
+            padding: 20px;
+        }
+
+        .collection-title {
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .collection-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .collection-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .collection-count {
+            font-weight: 600;
+            color: #000000;
+        }
+
+        .featured-items {
+            background: #f8f8f8;
+            padding: 60px 20px;
+            border-top: 2px solid #000000;
+            border-bottom: 2px solid #000000;
+        }
+
+        .featured-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .item-card {
+            background: #ffffff;
+            border: 1px solid #ddd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .item-card:hover {
+            border-color: #000000;
+            box-shadow: 4px 4px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 150px;
+            background: #f0f0f0;
+            overflow: hidden;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-content {
+            padding: 15px;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .item-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: #000000;
+        }
+
+        .browse-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-filter {
+            padding: 10px 20px;
+            border: 2px solid #000000;
+            background: #ffffff;
+            color: #000000;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .category-filter:hover,
+        .category-filter.active {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .footer {
+            background: #000000;
+            color: #ffffff;
+            padding: 60px 20px 30px;
+            border-top: 2px solid #333;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #cccccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .view-all {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .view-all-btn {
+            padding: 12px 30px;
+            border: 2px solid #000000;
+            background: #ffffff;
+            color: #000000;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .view-all-btn:hover {
+            background: #000000;
+            color: #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .logo-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .stats-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .collections-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-top: none;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1001;
+        }
+
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background: #f0f0f0;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo">BLINK ARCHIVE</div>
+                <nav class="nav-links">
+                    <a href="#collections">Collections</a>
+                    <a href="#featured">Featured</a>
+                    <a href="#browse">Browse</a>
+                    <a href="#about">About</a>
+                </nav>
+            </div>
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search digital artifacts...">
+                    <i class="fas fa-search search-icon" onclick="performSearch()"></i>
+                    <div class="search-suggestions" id="searchSuggestions"></div>
+                </div>
+                <div class="auth-buttons">
+                    <button class="auth-btn" onclick="location.href='add-product.html'">Admin</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <section class="hero-banner">
+            <div class="hero-content">
+                <h1 class="hero-title">BLINK ARCHIVE</h1>
+                <p class="hero-subtitle">Preserving Digital Artifacts for Future Generations</p>
+                <div class="search-bar" style="width: 100%; max-width: 600px; margin: 0 auto;">
+                    <input type="text" id="heroSearch" placeholder="Search through 10,000+ digital artifacts...">
+                    <i class="fas fa-search search-icon" onclick="performHeroSearch()"></i>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-bar">
+            <div class="stats-content">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalItems">0</div>
+                    <div class="stat-label">Digital Items</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalViews">0</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="activeCollections">0</div>
+                    <div class="stat-label">Collections</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Available</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="collections-grid" id="collections">
+            <h2 class="section-title">Featured Collections</h2>
+            <div class="collections-container" id="collectionsContainer">
+                <div class="loading">Loading collections...</div>
+            </div>
+        </section>
+
+        <section class="featured-items" id="featured">
+            <div class="featured-container">
+                <h2 class="section-title">Recently Added</h2>
+                <div class="items-grid" id="recentItems">
+                    <div class="loading">Loading recent items...</div>
+                </div>
+                <div class="view-all">
+                    <button class="view-all-btn" onclick="viewAllItems()">View All Items</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="browse-section" id="browse">
+            <h2 class="section-title">Browse Categories</h2>
+            <div class="category-filters">
+                <button class="category-filter active" onclick="filterCategory('all')">All Items</button>
+                <button class="category-filter" onclick="filterCategory('html')">HTML Templates</button>
+                <button class="category-filter" onclick="filterCategory('code')">Code Snippets</button>
+                <button class="category-filter" onclick="filterCategory('design')">Design Systems</button>
+                <button class="category-filter" onclick="filterCategory('archive')">Digital Archives</button>
+            </div>
+            <div class="items-grid" id="browseItems">
+                <div class="loading">Loading items...</div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer" id="about">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Blink Archive</h3>
+                <p style="color: #cccccc; line-height: 1.6;">
+                    A digital repository preserving unique web artifacts, HTML templates, and code snippets for developers, designers, and digital historians.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#collections">Collections</a></li>
+                    <li><a href="#featured">Featured Items</a></li>
+                    <li><a href="#browse">Browse All</a></li>
+                    <li><a href="add-product.html">Admin Panel</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">API Documentation</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Digital Rights</a></li>
+                    <li><a href="#">Copyright</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Blink Archive. Preserving digital history, one artifact at a time.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy, limit, where, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzhfXHrY48d2DhlWwhSTxMHl04USLjtz0",
+            authDomain: "blink-archive.firebaseapp.com",
+            projectId: "blink-archive",
+            storageBucket: "blink-archive.firebasestorage.app",
+            messagingSenderId: "524384519627",
+            appId: "1:524384519627:web:10fc00ae09ce91a573a24e",
+            measurementId: "G-3C18W3NH1V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allProducts = [];
+        let searchTimeout;
+
+        // Initialize the application
+        async function initializeAppData() {
+            await loadStatistics();
+            await loadFeaturedCollections();
+            await loadRecentItems();
+            await loadBrowseItems();
+            setupSearchFunctionality();
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                const totalItems = querySnapshot.size;
+                let totalViews = 0;
+                
+                querySnapshot.forEach(doc => {
+                    const product = doc.data();
+                    totalViews += product.views || 0;
+                });
+
+                document.getElementById('totalItems').textContent = totalItems.toLocaleString();
+                document.getElementById('totalViews').textContent = totalViews.toLocaleString();
+                document.getElementById('activeCollections').textContent = Math.ceil(totalItems / 10); // Simulate collections
+
+                // Store all products for search
+                allProducts = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        // Load featured collections (grouped products)
+        async function loadFeaturedCollections() {
+            const container = document.getElementById('collectionsContainer');
+            
+            try {
+                const q = query(collection(db, "products"), orderBy("views", "desc"), limit(6));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<div class="loading">No collections found</div>';
+                    return;
+                }
+
+                const collections = [
+                    { name: "Popular Templates", description: "Most viewed HTML templates and designs", count: querySnapshot.size },
+                    { name: "Code Archives", description: "Historical code snippets and patterns", count: Math.floor(querySnapshot.size / 2) },
+                    { name: "Design Systems", description: "Complete design frameworks and UI kits", count: Math.floor(querySnapshot.size / 3) }
+                ];
+
+                container.innerHTML = collections.map(collection => `
+                    <div class="collection-card" onclick="browseCollection('${collection.name}')">
+                        <div class="collection-image">
+                            <img src="https://via.placeholder.com/400x200/1a1a1a/ffffff?text=${encodeURIComponent(collection.name)}" alt="${collection.name}">
+                        </div>
+                        <div class="collection-content">
+                            <div class="collection-title">${collection.name}</div>
+                            <div class="collection-description">${collection.description}</div>
+                            <div class="collection-meta">
+                                <span>${collection.count} items</span>
+                                <span>Explore →</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading collections:', error);
+                container.innerHTML = '<div class="loading">Error loading collections</div>';
+            }
+        }
+
+        // Load recently added items
+        async function loadRecentItems() {
+            const container = document.getElementById('recentItems');
+            
+            try {
+                const q = query(collection(db, "products"), orderBy("created_at", "desc"), limit(8));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<div class="loading">No recent items</div>';
+                    return;
+                }
+
+                container.innerHTML = querySnapshot.docs.map(doc => {
+                    const product = doc.data();
+                    const date = product.created_at?.toDate() || new Date();
+                    const imageUrl = product.images?.[0] || 'https://via.placeholder.com/300x200?text=No+Image';
+                    
+                    return `
+                        <div class="item-card" onclick="viewProduct('${doc.id}')">
+                            <div class="item-image">
+                                <img src="${imageUrl}" alt="${product.name}">
+                            </div>
+                            <div class="item-content">
+                                <div class="item-title">${product.name}</div>
+                                <div class="item-meta">
+                                    <span>${date.toLocaleDateString()}</span>
+                                    <span class="item-price">${product.price} BTC</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading recent items:', error);
+                container.innerHTML = '<div class="loading">Error loading items</div>';
+            }
+        }
+
+        // Load browse items
+        async function loadBrowseItems() {
+            const container = document.getElementById('browseItems');
+            
+            try {
+                const q = query(collection(db, "products"), orderBy("views", "desc"), limit(12));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<div class="loading">No items found</div>';
+                    return;
+                }
+
+                container.innerHTML = querySnapshot.docs.map(doc => {
+                    const product = doc.data();
+                    const date = product.last_updated?.toDate() || product.created_at.toDate();
+                    const imageUrl = product.images?.[0] || 'https://via.placeholder.com/300x200?text=No+Image';
+                    
+                    return `
+                        <div class="item-card" onclick="viewProduct('${doc.id}')">
+                            <div class="item-image">
+                                <img src="${imageUrl}" alt="${product.name}">
+                            </div>
+                            <div class="item-content">
+                                <div class="item-title">${product.name}</div>
+                                <div class="item-meta">
+                                    <span>${product.views || 0} views</span>
+                                    <span class="item-price">${product.price} BTC</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading browse items:', error);
+                container.innerHTML = '<div class="loading">Error loading items</div>';
+            }
+        }
+
+        // Search functionality
+        function setupSearchFunctionality() {
+            const searchInput = document.getElementById('searchInput');
+            const heroSearch = document.getElementById('heroSearch');
+            const suggestions = document.getElementById('searchSuggestions');
+
+            // Search input handler
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const term = e.target.value.trim();
+                
+                if (term.length > 2) {
+                    showSearchSuggestions(term);
+                } else {
+                    suggestions.style.display = 'none';
+                }
+            });
+
+            // Hero search handler
+            heroSearch.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const term = e.target.value.trim();
+                
+                if (term.length > 2) {
+                    showSearchSuggestions(term, true);
+                } else {
+                    suggestions.style.display = 'none';
+                }
+            });
+
+            // Enter key handlers
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+
+            heroSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performHeroSearch();
+            });
+        }
+
+        function showSearchSuggestions(term, isHero = false) {
+            const suggestions = document.getElementById('searchSuggestions');
+            const matchedProducts = allProducts.filter(product => 
+                product.name.toLowerCase().includes(term.toLowerCase())
+            ).slice(0, 5);
+
+            if (matchedProducts.length > 0) {
+                suggestions.innerHTML = matchedProducts.map(product => `
+                    <div class="suggestion-item" onclick="selectSuggestion('${product.name}', ${isHero})">
+                        <strong>${product.name}</strong>
+                        <div style="font-size: 0.8rem; color: #666;">${product.description.substring(0, 50)}...</div>
+                    </div>
+                `).join('');
+                suggestions.style.display = 'block';
+            } else {
+                suggestions.style.display = 'none';
+            }
+        }
+
+        function selectSuggestion(productName, isHero) {
+            if (isHero) {
+                document.getElementById('heroSearch').value = productName;
+            } else {
+                document.getElementById('searchInput').value = productName;
+            }
+            document.getElementById('searchSuggestions').style.display = 'none';
+            performSearch();
+        }
+
+        function performSearch() {
+            const term = document.getElementById('searchInput').value.trim();
+            if (term) {
+                window.location.href = `search.html?q=${encodeURIComponent(term)}`;
+            }
+        }
+
+        function performHeroSearch() {
+            const term = document.getElementById('heroSearch').value.trim();
+            if (term) {
+                window.location.href = `search.html?q=${encodeURIComponent(term)}`;
+            }
+        }
+
+        // Category filtering
+        function filterCategory(category) {
+            // Update active button
+            document.querySelectorAll('.category-filter').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // In a real implementation, this would filter the displayed items
+            console.log(`Filtering by category: ${category}`);
+        }
+
+        // Navigation functions
+        window.browseCollection = function(collectionName) {
+            window.location.href = `search.html?collection=${encodeURIComponent(collectionName)}`;
+        };
+
+        window.viewProduct = async function(productId) {
+            // Increment view count
+            try {
+                const docRef = doc(db, "products", productId);
+                await updateDoc(docRef, {
+                    views: increment(1)
+                });
+            } catch (error) {
+                console.error('Error updating view count:', error);
+            }
+            
+            // Redirect to product page
+            window.location.href = `view.html?id=${productId}`;
+        };
+
+        window.viewAllItems = function() {
+            window.location.href = 'search.html';
+        };
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-bar')) {
+                document.getElementById('searchSuggestions').style.display = 'none';
+            }
+        });
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', initializeAppData);
+    </script>
+</body>
+</html>
