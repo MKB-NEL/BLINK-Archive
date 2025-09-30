@@ -408,6 +408,8 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .download-btn:hover {
@@ -420,6 +422,11 @@
             margin-top: 15px;
             color: #666;
             font-size: 0.9rem;
+        }
+
+        /* Action Area - Dynamic Content */
+        .action-area {
+            margin-top: 20px;
         }
 
         /* Mobile Responsive */
@@ -530,17 +537,16 @@
                 </div>
             </div>
 
-            <!-- Purchase Section -->
+            <!-- Action Area - Dynamic Content -->
             <div class="purchase-section">
                 <div class="price-section">
                     <div class="price" id="productPrice">Loading...</div>
                     <div class="currency">BTC</div>
                 </div>
 
-                <button class="purchase-btn" id="purchaseBtn">
-                    <i class="fas fa-shopping-cart"></i>
-                    Purchase Now
-                </button>
+                <div class="action-area" id="actionArea">
+                    <!-- Content will be dynamically populated -->
+                </div>
 
                 <div class="security-badges">
                     <div class="badge">
@@ -616,13 +622,13 @@
                 <h2 class="download-title">Payment Confirmed!</h2>
                 <p class="download-subtitle">Your digital product is ready for download</p>
                 
-                <button class="download-btn" id="downloadBtn">
+                <a href="#" class="download-btn" id="downloadBtn" target="_blank">
                     <i class="fas fa-download"></i>
                     Download Now
-                </button>
+                </a>
                 
                 <div class="timer" id="downloadTimer">
-                    Link expires in: <span id="timerCountdown">5:00</span>
+                    Link is available for 24 hours
                 </div>
             </div>
         </div>
@@ -652,8 +658,6 @@
         let currentProduct = null;
         let currentOrder = null;
         let paymentCheckInterval = null;
-        let downloadTimerInterval = null;
-        let downloadExpiryTime = null;
 
         // Initialize product page
         async function initializeProductPage() {
@@ -668,13 +672,21 @@
 
             await loadProduct(productId);
             setupEventListeners();
+            checkExistingOrder();
+        }
+
+        // Check for existing order in localStorage
+        function checkExistingOrder() {
+            const savedOrder = localStorage.getItem(`blink_order_${currentProduct.id}`);
+            if (savedOrder) {
+                currentOrder = JSON.parse(savedOrder);
+                checkOrderStatus(currentOrder.id);
+            }
         }
 
         // Setup event listeners
         function setupEventListeners() {
-            document.getElementById('purchaseBtn').addEventListener('click', initiatePurchase);
             document.getElementById('copyAddressBtn').addEventListener('click', copyAddress);
-            document.getElementById('downloadBtn').addEventListener('click', downloadProduct);
         }
 
         // Load product details from Firebase
@@ -701,6 +713,9 @@
                 await updateDoc(doc(db, "products", productId), {
                     views: increment(1)
                 });
+
+                // Show appropriate action based on order status
+                showActionArea();
 
             } catch (error) {
                 console.error('Error loading product:', error);
@@ -729,7 +744,7 @@
             }
 
             // Display last updated date
-            const lastUpdated = currentProduct.last_updated?.toDate() || currentProduct.created_at.toDate();
+            const lastUpdated = currentProduct.last_updated?.toDate() || currentProduct.created_at?.toDate() || new Date();
             document.getElementById('lastUpdated').textContent = lastUpdated.toLocaleDateString();
             
             // Display views
@@ -780,13 +795,63 @@
             element.classList.add('active');
         }
 
+        // Show appropriate action based on order status
+        function showActionArea() {
+            const actionArea = document.getElementById('actionArea');
+            
+            if (currentOrder) {
+                // Check order status
+                checkOrderStatus(currentOrder.id);
+            } else {
+                // Show purchase button
+                actionArea.innerHTML = `
+                    <button class="purchase-btn" id="purchaseBtn">
+                        <i class="fas fa-shopping-cart"></i>
+                        Purchase Now
+                    </button>
+                `;
+                
+                document.getElementById('purchaseBtn').addEventListener('click', initiatePurchase);
+            }
+        }
+
+        // Check order status
+        async function checkOrderStatus(orderId) {
+            try {
+                // In a real implementation, you would check your backend/API
+                // For demo, we'll simulate checking Firebase
+                const ordersQuery = query(collection(db, "orders"), where("id", "==", orderId));
+                const querySnapshot = await getDocs(ordersQuery);
+                
+                if (!querySnapshot.empty) {
+                    const orderDoc = querySnapshot.docs[0];
+                    const orderData = orderDoc.data();
+                    
+                    if (orderData.status === 'paid') {
+                        showDownloadSection(orderData.downloadUrl);
+                    } else {
+                        showInvoiceSection();
+                        startPaymentChecking();
+                    }
+                } else {
+                    // Order not found, show purchase button
+                    showActionArea();
+                }
+                
+            } catch (error) {
+                console.error('Error checking order status:', error);
+                // Fallback to showing purchase button
+                showActionArea();
+            }
+        }
+
         // Initialize purchase process
         async function initiatePurchase() {
             if (!currentProduct) return;
 
             const purchaseBtn = document.getElementById('purchaseBtn');
             purchaseBtn.disabled = true;
-            purchaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Invoice...';
+            purchaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Order...';
 
             try {
                 // Generate unique order ID
@@ -800,14 +865,18 @@
                     price: currentProduct.price,
                     currency: 'BTC',
                     status: 'pending',
-                    createdAt: new Date(),
+                    downloadUrl: currentProduct.download_link,
+                    createdAt: new Date().toISOString(),
                     userId: getUserId()
                 };
 
                 // Save order to Firebase
                 await addDoc(collection(db, "orders"), currentOrder);
 
-                // Create payment invoice with NOWPayments
+                // Save order to localStorage
+                localStorage.setItem(`blink_order_${currentProduct.id}`, JSON.stringify(currentOrder));
+
+                // Create payment invoice
                 await createPaymentInvoice();
 
             } catch (error) {
@@ -901,22 +970,22 @@
         function startPaymentChecking() {
             paymentCheckInterval = setInterval(async () => {
                 await checkPaymentStatus();
-            }, 10000);
+            }, 10000); // Check every 10 seconds
 
             // Initial check
             checkPaymentStatus();
         }
 
-        // Check payment status
+        // Check payment status - FIXED VERSION
         async function checkPaymentStatus() {
             if (!currentOrder) return;
 
             try {
-                // In production, you would check with NOWPayments API
+                // In production, you would check with NOWPayments API or your backend
                 // For demo, we'll simulate payment confirmation after 30 seconds
-                const orderAge = Date.now() - currentOrder.createdAt.toDate().getTime();
+                const orderAge = Date.now() - new Date(currentOrder.createdAt).getTime();
                 
-                if (orderAge > 30000) {
+                if (orderAge > 30000) { // 30 seconds for demo
                     await confirmPayment();
                 }
 
@@ -938,8 +1007,12 @@
                     const orderDoc = querySnapshot.docs[0];
                     await updateDoc(doc(db, "orders", orderDoc.id), {
                         status: 'paid',
-                        paidAt: new Date()
+                        paidAt: new Date().toISOString()
                     });
+
+                    // Update local order
+                    currentOrder.status = 'paid';
+                    localStorage.setItem(`blink_order_${currentProduct.id}`, JSON.stringify(currentOrder));
                 }
 
                 // Stop payment checking
@@ -948,7 +1021,7 @@
                 }
 
                 // Show download section
-                showDownloadSection();
+                showDownloadSection(currentOrder.downloadUrl);
 
             } catch (error) {
                 console.error('Error confirming payment:', error);
@@ -956,75 +1029,14 @@
         }
 
         // Show download section
-        function showDownloadSection() {
+        function showDownloadSection(downloadUrl) {
+            document.querySelector('.purchase-section').style.display = 'none';
             document.getElementById('invoiceSection').style.display = 'none';
             document.getElementById('downloadSection').style.display = 'block';
 
-            // Set download expiry time (5 minutes from now)
-            downloadExpiryTime = Date.now() + 5 * 60 * 1000;
-            startDownloadTimer();
-        }
-
-        // Start download timer
-        function startDownloadTimer() {
-            updateDownloadTimer();
-
-            downloadTimerInterval = setInterval(() => {
-                updateDownloadTimer();
-            }, 1000);
-        }
-
-        // Update download timer display
-        function updateDownloadTimer() {
-            if (!downloadExpiryTime) return;
-
-            const now = Date.now();
-            const timeLeft = downloadExpiryTime - now;
-
-            if (timeLeft <= 0) {
-                // Timer expired
-                clearInterval(downloadTimerInterval);
-                document.getElementById('downloadBtn').disabled = true;
-                document.getElementById('timerCountdown').textContent = 'EXPIRED';
-                document.getElementById('timerCountdown').style.color = '#ff4444';
-                return;
-            }
-
-            const minutes = Math.floor(timeLeft / 60000);
-            const seconds = Math.floor((timeLeft % 60000) / 1000);
-            document.getElementById('timerCountdown').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Download product
-        async function downloadProduct() {
-            if (!currentProduct || !currentOrder) return;
-
-            try {
-                // Generate secure download URL
-                const downloadUrl = await generateSecureDownloadUrl();
-                
-                // Create temporary download link
-                const link = document.createElement('a');
-                link.href = downloadUrl;
-                link.download = `${currentProduct.name.replace(/\s+/g, '_')}.zip`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                // Update download count
-                await updateDoc(doc(db, "products", currentProduct.id), {
-                    downloads: increment(1)
-                });
-
-            } catch (error) {
-                console.error('Error downloading product:', error);
-                alert('Error downloading product. Please try again.');
-            }
-        }
-
-        // Generate secure download URL
-        async function generateSecureDownloadUrl() {
-            return currentProduct.download_link || '#';
+            // Set download link
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.href = downloadUrl;
         }
 
         // Copy payment address to clipboard
