@@ -55,7 +55,6 @@
             margin: 0 20px;
         }
 
-        /* Google-style Search Bar Animation */
         .search-bar {
             display: flex;
             align-items: center;
@@ -94,6 +93,32 @@
 
         .search-bar.focused .search-icon {
             color: #1a73e8;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1a73e8;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #ffffff;
+        }
+
+        .profile-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 2px #1a73e8;
         }
 
         .back-btn {
@@ -144,25 +169,28 @@
             font-size: 0.8rem;
         }
 
-        /* Filters Section */
-        .filters-section {
+        /* Main Content Layout with Flexbox */
+        .search-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        /* Filters Sidebar */
+        .filters-sidebar {
+            flex: 0 0 280px;
             background: #ffffff;
             border: 2px solid #000000;
             padding: 25px;
-            margin-bottom: 30px;
-            border-radius: 0;
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
+            position: sticky;
+            top: 100px;
         }
 
         .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            margin-bottom: 30px;
         }
 
         .filter-title {
@@ -171,25 +199,28 @@
             color: #000000;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .price-inputs {
             display: flex;
+            flex-direction: column;
             gap: 10px;
-            align-items: center;
         }
 
         .price-inputs input {
-            flex: 1;
-            padding: 10px;
+            padding: 12px;
             border: 2px solid #000000;
             background: #ffffff;
             font-family: inherit;
             border-radius: 0;
+            font-size: 0.9rem;
         }
 
         .apply-btn {
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: 2px solid #000000;
             background: #000000;
             color: #ffffff;
@@ -200,6 +231,8 @@
             letter-spacing: 1px;
             transition: all 0.3s ease;
             border-radius: 0;
+            margin-top: 10px;
+            width: 100%;
         }
 
         .apply-btn:hover {
@@ -233,47 +266,36 @@
             font-weight: 500;
         }
 
-        .color-search {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
+        .sort-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sort-option {
+            display: flex;
+            align-items: center;
             gap: 10px;
-            margin-top: 10px;
-        }
-
-        .color-option {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #000000;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
         }
 
-        .color-option:hover {
-            transform: scale(1.1);
+        .sort-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #000000;
         }
 
-        .color-option.selected {
-            border-color: #1a73e8;
-            box-shadow: 0 0 0 2px #1a73e8;
+        .sort-option label {
+            font-size: 0.9rem;
+            color: #000000;
+            cursor: pointer;
+            font-weight: 500;
         }
 
-        .color-option.selected::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ffffff;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        /* Search Results Grid */
-        .search-results {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 30px;
+        /* Results Grid */
+        .results-main {
+            flex: 1;
+            min-width: 0;
         }
 
         .results-grid {
@@ -371,9 +393,9 @@
             font-size: 1rem;
         }
 
-        .price-high { color: #00a000; } /* Green for > 0.1 BTC */
-        .price-medium { color: #ff6b00; } /* Orange for 0.009 - 0.1 BTC */
-        .price-low { color: #ff4444; } /* Red for < 0.009 BTC */
+        .price-high { color: #00a000; }
+        .price-medium { color: #ff6b00; }
+        .price-low { color: #ff4444; }
 
         .archive-footer {
             display: flex;
@@ -409,6 +431,186 @@
         .download-btn:hover {
             background: #ffffff;
             color: #000000;
+        }
+
+        /* Auth Modal */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        .auth-box {
+            background: #ffffff;
+            border: 2px solid #000000;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #000000;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #ff4444;
+        }
+
+        .auth-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #000000;
+        }
+
+        .auth-subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .auth-tab.active {
+            color: #000000;
+            border-bottom: 2px solid #000000;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #000000;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #000000;
+            background: #ffffff;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 4px 4px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        .auth-submit {
+            width: 100%;
+            padding: 15px;
+            background: #000000;
+            color: #ffffff;
+            border: 2px solid #000000;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .auth-submit:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .auth-switch {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .auth-switch a {
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .auth-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .auth-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
         }
 
         /* Loading Animation */
@@ -614,13 +816,16 @@
                 padding: 8px 16px;
             }
 
-            .filters-grid {
-                grid-template-columns: 1fr;
+            .search-content {
+                flex-direction: column;
+                padding: 20px 15px;
                 gap: 20px;
             }
 
-            .color-search {
-                grid-template-columns: repeat(4, 1fr);
+            .filters-sidebar {
+                flex: none;
+                width: 100%;
+                position: static;
             }
 
             .results-grid {
@@ -661,6 +866,11 @@
                 width: 100%;
                 text-align: center;
             }
+
+            .auth-box {
+                padding: 30px 20px;
+                margin: 20px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -691,6 +901,12 @@
                 text-align: center;
             }
 
+            .archive-meta {
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-start;
+            }
+
             .pagination {
                 gap: 8px;
             }
@@ -700,13 +916,12 @@
                 font-size: 0.8rem;
             }
 
-            .color-search {
-                grid-template-columns: repeat(4, 1fr);
+            .auth-box {
+                padding: 25px 15px;
             }
 
-            .color-option {
-                width: 35px;
-                height: 35px;
+            .auth-title {
+                font-size: 1.5rem;
             }
         }
 
@@ -733,12 +948,85 @@
             <div class="search-section">
                 <div class="search-bar" id="searchBar">
                     <input type="text" id="searchInput" placeholder="Search digital artifacts..." autocomplete="off">
-                    <i class="fas fa-search search-icon" onclick="performSearch()"></i>
+                    <i class="fas fa-search search-icon" id="searchIcon"></i>
                     <div class="search-suggestions" id="searchSuggestions"></div>
+                </div>
+            </div>
+            <div class="profile-section">
+                <div class="profile-circle" id="profileCircle" title="Click to manage account">
+                    <i class="fas fa-user" id="profileIcon"></i>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-box">
+            <button class="close-btn" id="closeAuthModal">&times;</button>
+            
+            <h2 class="auth-title">Join Blink Archive</h2>
+            <p class="auth-subtitle">Sign in to purchase digital artifacts</p>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="loginTab">Sign In</button>
+                <button class="auth-tab" id="signupTab">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm">
+                <div class="auth-message" id="loginMessage"></div>
+                
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="auth-submit">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+
+                <div class="auth-switch">
+                    Don't have an account? <a id="switchToSignup">Sign up here</a>
+                </div>
+            </form>
+
+            <!-- Signup Form -->
+            <form class="auth-form" id="signupForm">
+                <div class="auth-message" id="signupMessage"></div>
+                
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required placeholder="Create a password (min. 6 characters)">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required placeholder="Confirm your password">
+                </div>
+
+                <button type="submit" class="auth-submit">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+
+                <div class="auth-switch">
+                    Already have an account? <a id="switchToLogin">Sign in here</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="main-container">
         <section class="search-header">
@@ -750,84 +1038,88 @@
             </div>
         </section>
 
-        <section class="search-results">
-            <!-- Filters Section -->
-            <div class="filters-section">
-                <div class="filters-grid">
-                    <!-- Price Range Filter -->
-                    <div class="filter-group">
-                        <div class="filter-title">Price Range</div>
-                        <div class="price-inputs">
-                            <input type="number" id="minPrice" placeholder="Min BTC" step="0.0000001" min="0">
-                            <input type="number" id="maxPrice" placeholder="Max BTC" step="0.0000001" min="0">
-                        </div>
-                        <button class="apply-btn" onclick="applyPriceFilter()">Apply Filter</button>
-                    </div>
-
-                    <!-- Date Added Filter -->
-                    <div class="filter-group">
-                        <div class="filter-title">Date Added</div>
-                        <div class="filter-options">
-                            <div class="filter-option">
-                                <input type="radio" id="date-all" name="date" checked onchange="applyDateFilter('all')">
-                                <label for="date-all">All Time</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="radio" id="date-week" name="date" onchange="applyDateFilter('week')">
-                                <label for="date-week">Past Week</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="radio" id="date-month" name="date" onchange="applyDateFilter('month')">
-                                <label for="date-month">Past Month</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Color Search Filter -->
-                    <div class="filter-group">
-                        <div class="filter-title">Search by Color</div>
-                        <div class="color-search" id="colorSearch">
-                            <div class="color-option" style="background: #ff4444;" data-color="red" onclick="toggleColor('red')"></div>
-                            <div class="color-option" style="background: #ff6b00;" data-color="orange" onclick="toggleColor('orange')"></div>
-                            <div class="color-option" style="background: #ffd700;" data-color="yellow" onclick="toggleColor('yellow')"></div>
-                            <div class="color-option" style="background: #00a000;" data-color="green" onclick="toggleColor('green')"></div>
-                            <div class="color-option" style="background: #1a73e8;" data-color="blue" onclick="toggleColor('blue')"></div>
-                            <div class="color-option" style="background: #6a0dad;" data-color="purple" onclick="toggleColor('purple')"></div>
-                            <div class="color-option" style="background: #000000;" data-color="black" onclick="toggleColor('black')"></div>
-                            <div class="color-option" style="background: #ffffff; border: 2px solid #000000;" data-color="white" onclick="toggleColor('white')"></div>
-                        </div>
-                        <button class="apply-btn" onclick="applyColorFilter()" style="margin-top: 10px;">Search Colors</button>
+        <section class="search-content">
+            <!-- Filters Sidebar -->
+            <aside class="filters-sidebar">
+                <!-- Price Range Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">Price Range</div>
+                    <div class="price-inputs">
+                        <input type="number" id="minPrice" placeholder="Min BTC" step="0.0000001" min="0">
+                        <input type="number" id="maxPrice" placeholder="Max BTC" step="0.0000001" min="0">
+                        <button class="apply-btn" id="applyPriceBtn">Apply Price Filter</button>
                     </div>
                 </div>
-            </div>
+
+                <!-- Date Added Filter -->
+                <div class="filter-group">
+                    <div class="filter-title">Date Added</div>
+                    <div class="filter-options">
+                        <div class="filter-option">
+                            <input type="radio" id="date-all" name="date" checked>
+                            <label for="date-all">All Time</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="radio" id="date-week" name="date">
+                            <label for="date-week">Past Week</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="radio" id="date-month" name="date">
+                            <label for="date-month">Past Month</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alphabetical Order -->
+                <div class="filter-group">
+                    <div class="filter-title">Alphabetical Order</div>
+                    <div class="sort-options">
+                        <div class="sort-option">
+                            <input type="radio" id="sort-default" name="sort" checked>
+                            <label for="sort-default">Default</label>
+                        </div>
+                        <div class="sort-option">
+                            <input type="radio" id="sort-asc" name="sort">
+                            <label for="sort-asc">A to Z</label>
+                        </div>
+                        <div class="sort-option">
+                            <input type="radio" id="sort-desc" name="sort">
+                            <label for="sort-desc">Z to A</label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
 
             <!-- Results Grid -->
-            <div class="results-grid" id="resultsGrid">
-                <div class="no-results" id="initialState">
-                    <div class="no-results-icon">
-                        <i class="fas fa-search"></i>
+            <main class="results-main">
+                <div class="results-grid" id="resultsGrid">
+                    <div class="no-results" id="initialState">
+                        <div class="no-results-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="no-results-title">Search Digital Artifacts</div>
+                        <p>Find HTML templates, code snippets, and digital treasures in our archive</p>
                     </div>
-                    <div class="no-results-title">Search Digital Artifacts</div>
-                    <p>Find HTML templates, code snippets, and digital treasures in our archive</p>
                 </div>
-            </div>
 
-            <div class="pagination" id="pagination" style="display: none;">
-                <button class="page-btn" id="prevPage" onclick="changePage(-1)">
-                    <i class="fas fa-chevron-left"></i>
-                    Previous
-                </button>
-                <div class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></div>
-                <button class="page-btn" id="nextPage" onclick="changePage(1)">
-                    Next
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
+                <div class="pagination" id="pagination" style="display: none;">
+                    <button class="page-btn" id="prevPage">
+                        <i class="fas fa-chevron-left"></i>
+                        Previous
+                    </button>
+                    <div class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></div>
+                    <button class="page-btn" id="nextPage">
+                        Next
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </main>
         </section>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
         import { getFirestore, collection, getDocs, query, orderBy, where, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -841,20 +1133,21 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
+        let currentUser = null;
         let allProducts = [];
         let filteredProducts = [];
         let currentPage = 1;
         const itemsPerPage = 9;
         let searchTimeout;
         let searchStartTime;
-        let selectedColors = [];
         let currentFilters = {
             minPrice: null,
             maxPrice: null,
             dateRange: 'all',
-            colors: []
+            sortOrder: 'default'
         };
 
         // Initialize search from URL parameters
@@ -867,31 +1160,215 @@
                 performSearch(searchQuery);
             }
             
-            setupSearchAnimations();
+            setupEventListeners();
             loadAllProducts();
+            setupAuthModal();
         }
 
-        // Setup search bar animations and interactions
-        function setupSearchAnimations() {
-            const searchBar = document.getElementById('searchBar');
-            const searchInput = document.getElementById('searchInput');
-            const suggestions = document.getElementById('searchSuggestions');
+        // Setup authentication modal
+        function setupAuthModal() {
+            const authModal = document.getElementById('authModal');
+            const closeAuthModal = document.getElementById('closeAuthModal');
+            const profileCircle = document.getElementById('profileCircle');
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const switchToSignup = document.getElementById('switchToSignup');
+            const switchToLogin = document.getElementById('switchToLogin');
 
-            searchInput.addEventListener('focus', () => {
-                searchBar.classList.add('focused');
-                if (searchInput.value.length > 2) {
-                    showSearchSuggestions(searchInput.value);
+            // Profile circle click handler
+            profileCircle.addEventListener('click', () => {
+                if (currentUser) {
+                    // Redirect to settings if logged in
+                    window.location.href = 'settings.html';
+                } else {
+                    // Show auth modal if not logged in
+                    authModal.classList.add('active');
                 }
+            });
+
+            // Close modal
+            closeAuthModal.addEventListener('click', () => {
+                authModal.classList.remove('active');
+            });
+
+            // Tab switching
+            loginTab.addEventListener('click', () => {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+                clearAuthMessages();
+            });
+
+            signupTab.addEventListener('click', () => {
+                signupTab.classList.add('active');
+                loginTab.classList.remove('active');
+                signupForm.classList.add('active');
+                loginForm.classList.remove('active');
+                clearAuthMessages();
+            });
+
+            // Form switching
+            switchToSignup.addEventListener('click', () => {
+                signupTab.click();
+            });
+
+            switchToLogin.addEventListener('click', () => {
+                loginTab.click();
+            });
+
+            // Form submissions
+            loginForm.addEventListener('submit', handleLogin);
+            signupForm.addEventListener('submit', handleSignup);
+
+            // Close modal when clicking outside
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) {
+                    authModal.classList.remove('active');
+                }
+            });
+
+            // Monitor auth state changes
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                updateProfileUI();
+            });
+        }
+
+        // Handle login
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const message = document.getElementById('loginMessage');
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                currentUser = userCredential.user;
+                
+                message.textContent = 'Successfully signed in!';
+                message.className = 'auth-message success';
+                
+                setTimeout(() => {
+                    document.getElementById('authModal').classList.remove('active');
+                    updateProfileUI();
+                }, 1500);
+
+            } catch (error) {
+                message.textContent = getAuthErrorMessage(error);
+                message.className = 'auth-message error';
+            }
+        }
+
+        // Handle signup
+        async function handleSignup(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const message = document.getElementById('signupMessage');
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                message.textContent = 'Passwords do not match';
+                message.className = 'auth-message error';
+                return;
+            }
+
+            // Validate password length
+            if (password.length < 6) {
+                message.textContent = 'Password must be at least 6 characters';
+                message.className = 'auth-message error';
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                currentUser = userCredential.user;
+                
+                message.textContent = 'Account created successfully!';
+                message.className = 'auth-message success';
+                
+                setTimeout(() => {
+                    document.getElementById('authModal').classList.remove('active');
+                    updateProfileUI();
+                }, 1500);
+
+            } catch (error) {
+                message.textContent = getAuthErrorMessage(error);
+                message.className = 'auth-message error';
+            }
+        }
+
+        // Get user-friendly auth error messages
+        function getAuthErrorMessage(error) {
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    return 'Email already in use';
+                case 'auth/invalid-email':
+                    return 'Invalid email address';
+                case 'auth/weak-password':
+                    return 'Password is too weak';
+                case 'auth/user-not-found':
+                    return 'No account found with this email';
+                case 'auth/wrong-password':
+                    return 'Incorrect password';
+                case 'auth/too-many-requests':
+                    return 'Too many attempts. Please try again later';
+                default:
+                    return 'An error occurred. Please try again';
+            }
+        }
+
+        // Clear auth messages
+        function clearAuthMessages() {
+            document.getElementById('loginMessage').className = 'auth-message';
+            document.getElementById('signupMessage').className = 'auth-message';
+        }
+
+        // Update profile UI based on auth state
+        function updateProfileUI() {
+            const profileCircle = document.getElementById('profileCircle');
+            const profileIcon = document.getElementById('profileIcon');
+
+            if (currentUser) {
+                // User is logged in - show first letter of email
+                const firstLetter = currentUser.email.charAt(0).toUpperCase();
+                profileCircle.innerHTML = firstLetter;
+                profileCircle.title = `Logged in as ${currentUser.email}`;
+            } else {
+                // User is not logged in - show user icon
+                profileCircle.innerHTML = '<i class="fas fa-user"></i>';
+                profileCircle.title = 'Click to sign in';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            const searchInput = document.getElementById('searchInput');
+            const searchIcon = document.getElementById('searchIcon');
+            const applyPriceBtn = document.getElementById('applyPriceBtn');
+            const dateRadios = document.querySelectorAll('input[name="date"]');
+            const sortRadios = document.querySelectorAll('input[name="sort"]');
+            const prevPageBtn = document.getElementById('prevPage');
+            const nextPageBtn = document.getElementById('nextPage');
+
+            // Search functionality
+            searchInput.addEventListener('focus', () => {
+                document.getElementById('searchBar').classList.add('focused');
             });
 
             searchInput.addEventListener('blur', () => {
                 setTimeout(() => {
-                    searchBar.classList.remove('focused');
-                    suggestions.style.display = 'none';
+                    document.getElementById('searchBar').classList.remove('focused');
+                    document.getElementById('searchSuggestions').style.display = 'none';
                 }, 200);
             });
 
-            // Real-time search with debouncing and case-insensitive search
             searchInput.addEventListener('input', (e) => {
                 clearTimeout(searchTimeout);
                 const term = e.target.value.trim();
@@ -899,7 +1376,7 @@
                 if (term.length > 2) {
                     showSearchSuggestions(term);
                 } else {
-                    suggestions.style.display = 'none';
+                    document.getElementById('searchSuggestions').style.display = 'none';
                 }
 
                 searchTimeout = setTimeout(() => {
@@ -911,11 +1388,36 @@
                 }, 500);
             });
 
+            searchIcon.addEventListener('click', () => {
+                performSearch();
+            });
+
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     performSearch();
                 }
             });
+
+            // Filter event listeners
+            applyPriceBtn.addEventListener('click', applyPriceFilter);
+
+            dateRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    currentFilters.dateRange = e.target.id.replace('date-', '');
+                    applyFilters();
+                });
+            });
+
+            sortRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    currentFilters.sortOrder = e.target.id.replace('sort-', '');
+                    applyFilters();
+                });
+            });
+
+            // Pagination
+            prevPageBtn.addEventListener('click', () => changePage(-1));
+            nextPageBtn.addEventListener('click', () => changePage(1));
         }
 
         // Load all products for search suggestions
@@ -931,7 +1433,7 @@
             }
         }
 
-        // Perform case-insensitive search with Firebase
+        // Perform case-insensitive search
         async function performSearch(searchTerm = null) {
             const term = searchTerm || document.getElementById('searchInput').value.trim();
             
@@ -957,7 +1459,7 @@
                 // Case-insensitive filtering
                 filteredProducts = allProducts.filter(product => 
                     product.name.toLowerCase().includes(term.toLowerCase()) ||
-                    product.description.toLowerCase().includes(term.toLowerCase())
+                    (product.description && product.description.toLowerCase().includes(term.toLowerCase()))
                 );
 
                 // Apply current filters
@@ -1008,31 +1510,36 @@
                 });
             }
 
-            // Color filter (simulated - in real implementation, you'd store dominant colors in Firestore)
-            if (currentFilters.colors.length > 0) {
-                filtered = filtered.filter(product => {
-                    // Simulate color matching - in real app, you'd check product.color field
-                    const productColors = getSimulatedProductColors(product);
-                    return currentFilters.colors.some(color => productColors.includes(color));
-                });
+            // Sort order
+            if (currentFilters.sortOrder === 'asc') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (currentFilters.sortOrder === 'desc') {
+                filtered.sort((a, b) => b.name.localeCompare(a.name));
             }
 
             return filtered;
         }
 
-        // Simulate product colors for demo (replace with actual color data from Firestore)
-        function getSimulatedProductColors(product) {
-            const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'black', 'white'];
-            // Use product ID to generate consistent "random" colors for demo
-            const hash = product.id.split('').reduce((a, b) => {
-                a = ((a << 5) - a) + b.charCodeAt(0);
-                return a & a;
-            }, 0);
-            const colorIndex = Math.abs(hash) % colors.length;
-            return [colors[colorIndex]];
+        // Apply price filter
+        function applyPriceFilter() {
+            const minPrice = parseFloat(document.getElementById('minPrice').value);
+            const maxPrice = parseFloat(document.getElementById('maxPrice').value);
+            
+            currentFilters.minPrice = isNaN(minPrice) ? null : minPrice;
+            currentFilters.maxPrice = isNaN(maxPrice) ? null : maxPrice;
+            
+            // Re-apply search with new filters
+            const currentSearch = document.getElementById('searchInput').value.trim();
+            if (currentSearch) {
+                performSearch(currentSearch);
+            } else if (allProducts.length > 0) {
+                // If no search term, filter all products
+                filteredProducts = applyFilters(allProducts);
+                displaySearchResults('all products');
+            }
         }
 
-        // Display search results in grid
+        // Display search results
         function displaySearchResults(searchTerm) {
             const resultsGrid = document.getElementById('resultsGrid');
             const resultsCount = document.getElementById('resultsCount');
@@ -1047,7 +1554,7 @@
             const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
             resultsGrid.innerHTML = currentProducts.map((product, index) => {
-                const date = product.last_updated?.toDate() || product.created_at.toDate();
+                const date = product.last_updated?.toDate() || product.created_at?.toDate() || new Date();
                 const imageUrl = product.images?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/666?text=Digital+Artifact';
                 
                 // Determine price color class
@@ -1059,7 +1566,7 @@
                 }
                 
                 return `
-                    <div class="archive-item fade-in" style="animation-delay: ${index * 0.1}s" onclick="viewProduct('${product.id}')">
+                    <div class="archive-item fade-in" style="animation-delay: ${index * 0.1}s">
                         <div class="archive-image">
                             <img src="${imageUrl}" alt="${product.name}" loading="lazy">
                         </div>
@@ -1078,7 +1585,7 @@
                                     <i class="fas fa-eye"></i>
                                     ${product.views || 0} views
                                 </div>
-                                <button class="download-btn" onclick="event.stopPropagation(); viewProduct('${product.id}')">
+                                <button class="download-btn" data-product-id="${product.id}">
                                     <i class="fas fa-download"></i>
                                     View Details
                                 </button>
@@ -1088,59 +1595,25 @@
                 `;
             }).join('');
 
+            // Add click listeners to product cards and buttons
+            document.querySelectorAll('.archive-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.download-btn')) {
+                        const productId = this.querySelector('.download-btn').getAttribute('data-product-id');
+                        viewProduct(productId);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const productId = this.getAttribute('data-product-id');
+                    viewProduct(productId);
+                });
+            });
+
             updatePagination(totalPages);
-        }
-
-        // Filter functions
-        function applyPriceFilter() {
-            const minPrice = parseFloat(document.getElementById('minPrice').value);
-            const maxPrice = parseFloat(document.getElementById('maxPrice').value);
-            
-            currentFilters.minPrice = isNaN(minPrice) ? null : minPrice;
-            currentFilters.maxPrice = isNaN(maxPrice) ? null : maxPrice;
-            
-            // Re-apply search with new filters
-            const currentSearch = document.getElementById('searchInput').value.trim();
-            if (currentSearch) {
-                performSearch(currentSearch);
-            }
-        }
-
-        function applyDateFilter(range) {
-            currentFilters.dateRange = range;
-            
-            const currentSearch = document.getElementById('searchInput').value.trim();
-            if (currentSearch) {
-                performSearch(currentSearch);
-            }
-        }
-
-        function toggleColor(color) {
-            const colorElement = document.querySelector(`.color-option[data-color="${color}"]`);
-            colorElement.classList.toggle('selected');
-            
-            if (colorElement.classList.contains('selected')) {
-                if (!currentFilters.colors.includes(color)) {
-                    currentFilters.colors.push(color);
-                }
-            } else {
-                currentFilters.colors = currentFilters.colors.filter(c => c !== color);
-            }
-        }
-
-        function applyColorFilter() {
-            const currentSearch = document.getElementById('searchInput').value.trim();
-            if (currentSearch) {
-                performSearch(currentSearch);
-            } else {
-                // If no search term, show all products with color filter
-                showLoadingState();
-                setTimeout(() => {
-                    const allProductsCopy = [...allProducts];
-                    filteredProducts = applyFilters(allProductsCopy);
-                    displaySearchResults('all products');
-                }, 500);
-            }
         }
 
         // Show search suggestions
@@ -1148,29 +1621,34 @@
             const suggestions = document.getElementById('searchSuggestions');
             const matchedProducts = allProducts.filter(product => 
                 product.name.toLowerCase().includes(term.toLowerCase()) ||
-                product.description.toLowerCase().includes(term.toLowerCase())
+                (product.description && product.description.toLowerCase().includes(term.toLowerCase()))
             ).slice(0, 5);
 
             if (matchedProducts.length > 0) {
                 suggestions.innerHTML = matchedProducts.map(product => `
-                    <div class="suggestion-item" onclick="selectSuggestion('${product.name}')">
+                    <div class="suggestion-item" data-suggestion="${product.name}">
                         <i class="fas fa-search suggestion-icon"></i>
                         <div>
                             <strong>${product.name}</strong>
-                            <div style="font-size: 0.8rem; color: #666;">${product.description.substring(0, 60)}...</div>
+                            <div style="font-size: 0.8rem; color: #666;">${product.description?.substring(0, 60)}...</div>
                         </div>
                     </div>
                 `).join('');
+                
+                // Add click listeners to suggestions
+                document.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const suggestion = this.getAttribute('data-suggestion');
+                        document.getElementById('searchInput').value = suggestion;
+                        suggestions.style.display = 'none';
+                        performSearch();
+                    });
+                });
+                
                 suggestions.style.display = 'block';
             } else {
                 suggestions.style.display = 'none';
             }
-        }
-
-        function selectSuggestion(productName) {
-            document.getElementById('searchInput').value = productName;
-            document.getElementById('searchSuggestions').style.display = 'none';
-            performSearch();
         }
 
         // Show loading state
@@ -1222,13 +1700,23 @@
                     <div class="no-results-suggestions">
                         <p>Popular searches:</p>
                         <div class="suggestion-list">
-                            <button class="suggestion-btn" onclick="performSearch('HTML template')">HTML Template</button>
-                            <button class="suggestion-btn" onclick="performSearch('CSS design')">CSS Design</button>
-                            <button class="suggestion-btn" onclick="performSearch('JavaScript code')">JavaScript Code</button>
+                            <button class="suggestion-btn" data-search="HTML template">HTML Template</button>
+                            <button class="suggestion-btn" data-search="CSS design">CSS Design</button>
+                            <button class="suggestion-btn" data-search="JavaScript code">JavaScript Code</button>
                         </div>
                     </div>
                 </div>
             `;
+
+            // Add click listeners to suggestion buttons
+            document.querySelectorAll('.suggestion-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const searchTerm = this.getAttribute('data-search');
+                    document.getElementById('searchInput').value = searchTerm;
+                    performSearch(searchTerm);
+                });
+            });
+
             document.getElementById('pagination').style.display = 'none';
         }
 
@@ -1265,7 +1753,7 @@
 
             const resultsGrid = document.getElementById('resultsGrid');
             resultsGrid.innerHTML = currentProducts.map((product, index) => {
-                const date = product.last_updated?.toDate() || product.created_at.toDate();
+                const date = product.last_updated?.toDate() || product.created_at?.toDate() || new Date();
                 const imageUrl = product.images?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/666?text=Digital+Artifact';
                 
                 let priceClass = 'price-low';
@@ -1276,7 +1764,7 @@
                 }
                 
                 return `
-                    <div class="archive-item fade-in" style="animation-delay: ${index * 0.1}s" onclick="viewProduct('${product.id}')">
+                    <div class="archive-item fade-in" style="animation-delay: ${index * 0.1}s">
                         <div class="archive-image">
                             <img src="${imageUrl}" alt="${product.name}">
                         </div>
@@ -1295,7 +1783,7 @@
                                     <i class="fas fa-eye"></i>
                                     ${product.views || 0} views
                                 </div>
-                                <button class="download-btn" onclick="event.stopPropagation(); viewProduct('${product.id}')">
+                                <button class="download-btn" data-product-id="${product.id}">
                                     <i class="fas fa-download"></i>
                                     View Details
                                 </button>
@@ -1305,20 +1793,42 @@
                 `;
             }).join('');
 
+            // Re-add click listeners
+            document.querySelectorAll('.archive-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (!e.target.closest('.download-btn')) {
+                        const productId = this.querySelector('.download-btn').getAttribute('data-product-id');
+                        viewProduct(productId);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const productId = this.getAttribute('data-product-id');
+                    viewProduct(productId);
+                });
+            });
+
             updatePagination(totalPages);
             
+            // Scroll to top of results smoothly
             document.querySelector('.search-results').scrollIntoView({ 
                 behavior: 'smooth',
                 block: 'start'
             });
         }
 
-        // Navigation functions
-        window.goHome = function() {
-            window.location.href = 'index.html';
-        };
+        // View product with auth check
+        async function viewProduct(productId) {
+            // Check if user is logged in before allowing purchase
+            if (!currentUser) {
+                document.getElementById('authModal').classList.add('active');
+                return;
+            }
 
-        window.viewProduct = async function(productId) {
+            // Increment view count
             try {
                 const docRef = doc(db, "products", productId);
                 await updateDoc(docRef, {
@@ -1328,23 +1838,19 @@
                 console.error('Error updating view count:', error);
             }
             
+            // Redirect to product page
             window.location.href = `view.html?id=${productId}`;
+        }
+
+        // Navigation functions
+        window.goHome = function() {
+            window.location.href = 'index.html';
         };
-
-        // Close suggestions when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-bar')) {
-                document.getElementById('searchSuggestions').style.display = 'none';
-            }
-        });
-
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', () => {
-            initializeSearch();
-        });
 
         // Initialize the search page
         document.addEventListener('DOMContentLoaded', initializeSearch);
     </script>
 </body>
 </html>
+
+
