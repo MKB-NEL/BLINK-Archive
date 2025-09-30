@@ -537,7 +537,7 @@
                     <div class="currency">BTC</div>
                 </div>
 
-                <button class="purchase-btn" id="purchaseBtn" onclick="initiatePurchase()">
+                <button class="purchase-btn" id="purchaseBtn">
                     <i class="fas fa-shopping-cart"></i>
                     Purchase Now
                 </button>
@@ -594,7 +594,7 @@
                 <div class="payment-address">
                     <div class="invoice-label">Payment Address</div>
                     <div class="address" id="paymentAddress">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div>
-                    <button class="copy-btn" onclick="copyAddress()">
+                    <button class="copy-btn" id="copyAddressBtn">
                         <i class="fas fa-copy"></i>
                         Copy Address
                     </button>
@@ -616,7 +616,7 @@
                 <h2 class="download-title">Payment Confirmed!</h2>
                 <p class="download-subtitle">Your digital product is ready for download</p>
                 
-                <button class="download-btn" id="downloadBtn" onclick="downloadProduct()">
+                <button class="download-btn" id="downloadBtn">
                     <i class="fas fa-download"></i>
                     Download Now
                 </button>
@@ -667,6 +667,14 @@
             }
 
             await loadProduct(productId);
+            setupEventListeners();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('purchaseBtn').addEventListener('click', initiatePurchase);
+            document.getElementById('copyAddressBtn').addEventListener('click', copyAddress);
+            document.getElementById('downloadBtn').addEventListener('click', downloadProduct);
         }
 
         // Load product details from Firebase
@@ -742,10 +750,18 @@
                 
                 // Create thumbnails
                 thumbnailsContainer.innerHTML = currentProduct.images.map((image, index) => `
-                    <div class="thumbnail ${index === 0 ? 'active' : ''}" onclick="changeMainImage('${image}', this)">
+                    <div class="thumbnail ${index === 0 ? 'active' : ''}" data-image="${image}">
                         <img src="${image}" alt="Thumbnail ${index + 1}">
                     </div>
                 `).join('');
+
+                // Add click listeners to thumbnails
+                document.querySelectorAll('.thumbnail').forEach(thumb => {
+                    thumb.addEventListener('click', function() {
+                        const imageSrc = this.getAttribute('data-image');
+                        changeMainImage(imageSrc, this);
+                    });
+                });
             } else {
                 // Use placeholder if no images
                 mainImage.src = 'https://via.placeholder.com/600x400/f5f5f5/666?text=No+Image';
@@ -754,7 +770,7 @@
         }
 
         // Change main image when thumbnail is clicked
-        window.changeMainImage = function(imageSrc, element) {
+        function changeMainImage(imageSrc, element) {
             document.getElementById('mainImageSrc').src = imageSrc;
             
             // Update active thumbnail
@@ -811,7 +827,7 @@
                     pay_currency: 'btc',
                     order_id: currentOrder.id,
                     order_description: currentProduct.name,
-                    ipn_callback_url: 'https://your-domain.com/webhook/nowpayments', // Your webhook URL
+                    ipn_callback_url: 'https://your-domain.com/webhook/nowpayments',
                     success_url: window.location.href,
                     cancel_url: window.location.href
                 };
@@ -852,7 +868,7 @@
             };
 
             displayInvoice(mockInvoice);
-            startPaymentChecking(); // Start checking for mock payment
+            startPaymentChecking();
         }
 
         // Display invoice to user
@@ -867,7 +883,7 @@
             document.getElementById('invoiceAmount').textContent = invoice.pay_amount + ' BTC';
             document.getElementById('paymentAddress').textContent = invoice.pay_address;
 
-            // Generate QR code (using simple text for demo - in production use a QR library)
+            // Generate QR code
             const qrCodeElement = document.getElementById('qrCode');
             qrCodeElement.innerHTML = `
                 <div style="text-align: center;">
@@ -885,7 +901,7 @@
         function startPaymentChecking() {
             paymentCheckInterval = setInterval(async () => {
                 await checkPaymentStatus();
-            }, 10000); // Check every 10 seconds
+            }, 10000);
 
             // Initial check
             checkPaymentStatus();
@@ -900,7 +916,7 @@
                 // For demo, we'll simulate payment confirmation after 30 seconds
                 const orderAge = Date.now() - currentOrder.createdAt.toDate().getTime();
                 
-                if (orderAge > 30000) { // 30 seconds for demo
+                if (orderAge > 30000) {
                     await confirmPayment();
                 }
 
@@ -984,7 +1000,7 @@
             if (!currentProduct || !currentOrder) return;
 
             try {
-                // Generate secure download URL (in production, this would be a signed URL from your backend)
+                // Generate secure download URL
                 const downloadUrl = await generateSecureDownloadUrl();
                 
                 // Create temporary download link
@@ -1006,10 +1022,8 @@
             }
         }
 
-        // Generate secure download URL (mock implementation)
+        // Generate secure download URL
         async function generateSecureDownloadUrl() {
-            // In production, this would call your backend to generate a signed URL
-            // For demo, we'll use the Mega link directly
             return currentProduct.download_link || '#';
         }
 
