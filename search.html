@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results - Blink Archive</title>
+    <title>Search - Blink Archive</title>
     <style>
         * {
             margin: 0;
@@ -38,12 +38,6 @@
             align-items: center;
         }
 
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-
         .logo {
             font-size: 1.8rem;
             font-weight: 700;
@@ -52,32 +46,13 @@
             cursor: pointer;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 25px;
-        }
-
-        .nav-links a {
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: opacity 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-links a:hover {
-            opacity: 0.8;
-        }
-
         .search-section {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 20px;
         }
 
         /* Google-style Search Bar Animation */
@@ -86,9 +61,9 @@
             align-items: center;
             background: #ffffff;
             border: 2px solid #dfe1e5;
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-radius: 24px;
-            width: 600px;
+            width: 100%;
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             position: relative;
@@ -98,11 +73,6 @@
             border-color: #1a73e8;
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
             transform: translateY(-1px);
-        }
-
-        .search-bar.expanded {
-            width: 700px;
-            border-radius: 8px 8px 0 0;
         }
 
         .search-bar input {
@@ -119,33 +89,25 @@
             color: #5f6368;
             cursor: pointer;
             transition: color 0.3s ease;
+            padding: 8px;
         }
 
         .search-bar.focused .search-icon {
             color: #1a73e8;
         }
 
-        .search-controls {
-            display: flex;
-            gap: 10px;
-            margin-left: 10px;
-        }
-
-        .search-btn {
-            background: #1a73e8;
-            color: #ffffff;
+        .back-btn {
+            background: transparent;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            color: #ffffff;
             cursor: pointer;
-            font-family: inherit;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            padding: 10px;
+            font-size: 1.2rem;
+            transition: opacity 0.3s ease;
         }
 
-        .search-btn:hover {
-            background: #1669d9;
-            box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
+        .back-btn:hover {
+            opacity: 0.8;
         }
 
         .main-container {
@@ -156,7 +118,7 @@
         /* Search Results Header */
         .search-header {
             background: #f8f9fa;
-            padding: 40px 20px 20px;
+            padding: 30px 20px 20px;
             border-bottom: 1px solid #e0e0e0;
         }
 
@@ -182,165 +144,69 @@
             font-size: 0.8rem;
         }
 
-        .search-filters {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            border: 1px solid #dadce0;
-            background: #ffffff;
-            color: #3c4043;
-            cursor: pointer;
-            border-radius: 18px;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn:hover,
-        .filter-btn.active {
-            background: #1a73e8;
-            color: #ffffff;
-            border-color: #1a73e8;
-        }
-
         /* Search Results Grid */
         .search-results {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 30px 20px;
         }
 
-        .results-container {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 40px;
-        }
-
-        /* Sidebar Filters */
-        .sidebar-filters {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-        }
-
-        .filter-section {
-            margin-bottom: 25px;
-        }
-
-        .filter-title {
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #3c4043;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .filter-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .filter-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .filter-option input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-        }
-
-        .filter-option label {
-            font-size: 0.85rem;
-            color: #5f6368;
-            cursor: pointer;
-        }
-
-        .price-range {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .price-inputs {
-            display: flex;
-            gap: 10px;
-        }
-
-        .price-inputs input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-
-        /* Results Grid */
         .results-grid {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 25px;
         }
 
         .archive-item {
             background: #ffffff;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 20px;
             transition: all 0.3s ease;
             cursor: pointer;
-            display: grid;
-            grid-template-columns: 120px 1fr;
-            gap: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .archive-item:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
             border-color: #1a73e8;
         }
 
         .archive-image {
-            width: 120px;
-            height: 120px;
+            width: 100%;
+            height: 180px;
             background: #f5f5f5;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
             border: 1px solid #e0e0e0;
+            margin-bottom: 15px;
         }
 
         .archive-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .archive-item:hover .archive-image img {
+            transform: scale(1.05);
         }
 
         .archive-content {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .archive-header {
-            margin-bottom: 10px;
         }
 
         .archive-title {
-            font-weight: 600;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-            color: #1a73e8;
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #1a1a1a;
             line-height: 1.3;
         }
 
@@ -348,12 +214,15 @@
             color: #5f6368;
             font-size: 0.9rem;
             line-height: 1.5;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            flex-grow: 1;
         }
 
         .archive-meta {
             display: flex;
-            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
             font-size: 0.8rem;
             color: #70757a;
         }
@@ -361,14 +230,13 @@
         .archive-price {
             font-weight: 700;
             color: #1a73e8;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
 
         .archive-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #f0f0f0;
         }
@@ -386,7 +254,7 @@
             color: #ffffff;
             border: none;
             padding: 8px 16px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-family: inherit;
             font-weight: 500;
@@ -396,71 +264,34 @@
 
         .download-btn:hover {
             background: #1669d9;
-            box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .page-btn {
-            padding: 10px 16px;
-            border: 1px solid #dadce0;
-            background: #ffffff;
-            color: #3c4043;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .page-btn:hover {
-            border-color: #1a73e8;
-            color: #1a73e8;
-        }
-
-        .page-btn.active {
-            background: #1a73e8;
-            color: #ffffff;
-            border-color: #1a73e8;
-        }
-
-        .page-info {
-            color: #70757a;
-            font-size: 0.9rem;
-            margin: 0 15px;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+            transform: translateY(-1px);
         }
 
         /* Loading Animation */
         .loading-results {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 40px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
         }
 
         .loading-item {
-            display: grid;
-            grid-template-columns: 120px 1fr;
-            gap: 20px;
-            padding: 20px;
             background: #ffffff;
             border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .loading-image {
-            width: 120px;
-            height: 120px;
+            width: 100%;
+            height: 180px;
             background: #f0f0f0;
-            border-radius: 6px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             animation: pulse 1.5s ease-in-out infinite;
         }
 
@@ -500,7 +331,7 @@
             background: #ffffff;
             border: 1px solid #e0e0e0;
             border-top: none;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 24px 24px;
             max-height: 300px;
             overflow-y: auto;
             display: none;
@@ -509,13 +340,13 @@
         }
 
         .suggestion-item {
-            padding: 12px 15px;
+            padding: 12px 20px;
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
             transition: background 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .suggestion-item:hover {
@@ -534,8 +365,10 @@
         /* No Results State */
         .no-results {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             color: #5f6368;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .no-results-icon {
@@ -562,66 +395,152 @@
             margin-top: 15px;
         }
 
+        .suggestion-btn {
+            padding: 10px 20px;
+            border: 1px solid #dadce0;
+            background: #ffffff;
+            color: #3c4043;
+            cursor: pointer;
+            border-radius: 18px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-btn:hover {
+            background: #1a73e8;
+            color: #ffffff;
+            border-color: #1a73e8;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .page-btn {
+            padding: 12px 20px;
+            border: 1px solid #dadce0;
+            background: #ffffff;
+            color: #3c4043;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-btn.active {
+            background: #1a73e8;
+            color: #ffffff;
+            border-color: #1a73e8;
+        }
+
+        .page-info {
+            color: #70757a;
+            font-size: 0.9rem;
+            margin: 0 20px;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .header-content {
-                flex-direction: column;
-                gap: 15px;
                 padding: 10px 15px;
-            }
-
-            .logo-section {
-                flex-direction: column;
-                gap: 15px;
-                width: 100%;
-            }
-
-            .nav-links {
-                gap: 15px;
-                justify-content: center;
-                width: 100%;
                 flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .logo {
+                font-size: 1.4rem;
+                letter-spacing: 2px;
             }
 
             .search-section {
-                width: 100%;
+                order: 3;
+                margin: 0;
+                max-width: 100%;
             }
 
             .search-bar {
-                width: 100%;
+                padding: 8px 16px;
             }
 
-            .search-bar.expanded {
-                width: 100%;
-            }
-
-            .results-container {
+            .results-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
 
-            .sidebar-filters {
-                position: static;
-                order: 2;
-            }
-
             .archive-item {
-                grid-template-columns: 80px 1fr;
-                gap: 15px;
                 padding: 15px;
             }
 
             .archive-image {
-                width: 80px;
-                height: 80px;
+                height: 150px;
             }
 
             .archive-title {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
 
             .archive-description {
-                font-size: 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .search-header {
+                padding: 20px 15px 15px;
+            }
+
+            .search-meta {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .page-info {
+                margin: 10px 0;
+                order: -1;
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                gap: 10px;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            .search-bar {
+                padding: 6px 12px;
+            }
+
+            .search-bar input {
+                font-size: 14px;
             }
 
             .archive-footer {
@@ -630,37 +549,44 @@
                 align-items: flex-start;
             }
 
-            .search-filters {
-                gap: 8px;
-            }
-
-            .filter-btn {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .nav-links a {
-                font-size: 0.8rem;
-            }
-
-            .search-bar {
-                padding: 6px 12px;
+            .download-btn {
+                width: 100%;
+                text-align: center;
             }
 
             .archive-meta {
                 flex-direction: column;
                 gap: 5px;
+                align-items: flex-start;
             }
 
             .pagination {
-                flex-wrap: wrap;
+                gap: 8px;
             }
 
-            .page-info {
-                margin: 10px 0;
+            .page-btn {
+                padding: 10px 15px;
+                font-size: 0.8rem;
             }
+        }
+
+        /* Smooth animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -669,34 +595,15 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <div class="logo-section">
-                <div class="logo" onclick="goHome()">BLINK ARCHIVE</div>
-                <nav class="nav-links">
-                    <a href="index.html#collections">
-                        <i class="fas fa-archive"></i>
-                        Collections
-                    </a>
-                    <a href="index.html#featured">
-                        <i class="fas fa-star"></i>
-                        Featured
-                    </a>
-                    <a href="index.html#browse">
-                        <i class="fas fa-compass"></i>
-                        Browse
-                    </a>
-                </nav>
-            </div>
+            <button class="back-btn" onclick="goHome()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="logo" onclick="goHome()">BLINK ARCHIVE</div>
             <div class="search-section">
                 <div class="search-bar" id="searchBar">
                     <input type="text" id="searchInput" placeholder="Search digital artifacts..." autocomplete="off">
                     <i class="fas fa-search search-icon" onclick="performSearch()"></i>
                     <div class="search-suggestions" id="searchSuggestions"></div>
-                </div>
-                <div class="search-controls">
-                    <button class="search-btn" onclick="performSearch()">
-                        <i class="fas fa-search"></i>
-                        Search
-                    </button>
                 </div>
             </div>
         </div>
@@ -706,109 +613,30 @@
         <section class="search-header">
             <div class="search-header-content">
                 <div class="search-meta">
-                    <div class="results-count" id="resultsCount">Searching...</div>
+                    <div class="results-count" id="resultsCount">Enter your search above</div>
                     <div class="search-time" id="searchTime"></div>
-                </div>
-                <div class="search-filters">
-                    <button class="filter-btn active" onclick="filterResults('all')">All</button>
-                    <button class="filter-btn" onclick="filterResults('html')">HTML</button>
-                    <button class="filter-btn" onclick="filterResults('code')">Code</button>
-                    <button class="filter-btn" onclick="filterResults('design')">Design</button>
-                    <button class="filter-btn" onclick="filterResults('archive')">Archive</button>
-                    <button class="filter-btn" onclick="sortResults('newest')">
-                        <i class="fas fa-sort-amount-down"></i>
-                        Newest
-                    </button>
-                    <button class="filter-btn" onclick="sortResults('popular')">
-                        <i class="fas fa-fire"></i>
-                        Popular
-                    </button>
                 </div>
             </div>
         </section>
 
         <section class="search-results">
-            <div class="results-container">
-                <aside class="sidebar-filters">
-                    <div class="filter-section">
-                        <div class="filter-title">Categories</div>
-                        <div class="filter-options">
-                            <div class="filter-option">
-                                <input type="checkbox" id="cat-html" checked>
-                                <label for="cat-html">HTML Templates</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="checkbox" id="cat-code" checked>
-                                <label for="cat-code">Code Snippets</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="checkbox" id="cat-design" checked>
-                                <label for="cat-design">Design Systems</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="checkbox" id="cat-archive" checked>
-                                <label for="cat-archive">Digital Archives</label>
-                            </div>
-                        </div>
+            <div class="results-grid" id="resultsGrid">
+                <div class="no-results" id="initialState">
+                    <div class="no-results-icon">
+                        <i class="fas fa-search"></i>
                     </div>
-                    <div class="filter-section">
-                        <div class="filter-title">Price Range</div>
-                        <div class="price-range">
-                            <div class="price-inputs">
-                                <input type="number" id="minPrice" placeholder="Min BTC" step="0.0000001">
-                                <input type="number" id="maxPrice" placeholder="Max BTC" step="0.0000001">
-                            </div>
-                            <button class="filter-btn" onclick="applyPriceFilter()">Apply</button>
-                        </div>
-                    </div>
-                    <div class="filter-section">
-                        <div class="filter-title">Date Added</div>
-                        <div class="filter-options">
-                            <div class="filter-option">
-                                <input type="radio" id="date-all" name="date" checked>
-                                <label for="date-all">All Time</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="radio" id="date-week" name="date">
-                                <label for="date-week">Past Week</label>
-                            </div>
-                            <div class="filter-option">
-                                <input type="radio" id="date-month" name="date">
-                                <label for="date-month">Past Month</label>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-
-                <div class="results-grid" id="resultsGrid">
-                    <div class="loading-results" id="loadingResults">
-                        <div class="loading-item">
-                            <div class="loading-image"></div>
-                            <div class="loading-content">
-                                <div class="loading-line" style="width: 70%"></div>
-                                <div class="loading-line medium"></div>
-                                <div class="loading-line short"></div>
-                            </div>
-                        </div>
-                        <div class="loading-item">
-                            <div class="loading-image"></div>
-                            <div class="loading-content">
-                                <div class="loading-line" style="width: 60%"></div>
-                                <div class="loading-line medium"></div>
-                                <div class="loading-line short"></div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="no-results-title">Search Digital Artifacts</div>
+                    <p>Find HTML templates, code snippets, and digital treasures in our archive</p>
                 </div>
             </div>
 
             <div class="pagination" id="pagination" style="display: none;">
-                <button class="page-btn" onclick="changePage(-1)">
+                <button class="page-btn" id="prevPage" onclick="changePage(-1)">
                     <i class="fas fa-chevron-left"></i>
                     Previous
                 </button>
                 <div class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></div>
-                <button class="page-btn" onclick="changePage(1)">
+                <button class="page-btn" id="nextPage" onclick="changePage(1)">
                     Next
                     <i class="fas fa-chevron-right"></i>
                 </button>
@@ -818,7 +646,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, orderBy, limit, where, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, orderBy, where, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBzhfXHrY48d2DhlWwhSTxMHl04USLjtz0",
@@ -836,7 +664,7 @@
         let allProducts = [];
         let filteredProducts = [];
         let currentPage = 1;
-        const itemsPerPage = 10;
+        const itemsPerPage = 9;
         let searchTimeout;
         let searchStartTime;
 
@@ -844,22 +672,17 @@
         function initializeSearch() {
             const urlParams = new URLSearchParams(window.location.search);
             const searchQuery = urlParams.get('q');
-            const collectionQuery = urlParams.get('collection');
             
             if (searchQuery) {
                 document.getElementById('searchInput').value = searchQuery;
                 performSearch(searchQuery);
-            } else if (collectionQuery) {
-                document.getElementById('searchInput').value = collectionQuery;
-                performSearch(collectionQuery);
-            } else {
-                loadAllProducts();
             }
             
             setupSearchAnimations();
+            loadAllProducts(); // Preload all products for suggestions
         }
 
-        // Setup search bar animations
+        // Setup search bar animations and interactions
         function setupSearchAnimations() {
             const searchBar = document.getElementById('searchBar');
             const searchInput = document.getElementById('searchInput');
@@ -867,7 +690,7 @@
 
             // Focus animation
             searchInput.addEventListener('focus', () => {
-                searchBar.classList.add('focused', 'expanded');
+                searchBar.classList.add('focused');
                 if (searchInput.value.length > 2) {
                     showSearchSuggestions(searchInput.value);
                 }
@@ -875,25 +698,30 @@
 
             searchInput.addEventListener('blur', () => {
                 setTimeout(() => {
-                    searchBar.classList.remove('focused', 'expanded');
+                    searchBar.classList.remove('focused');
                     suggestions.style.display = 'none';
                 }, 200);
             });
 
-            // Real-time search suggestions
+            // Real-time search with debouncing
             searchInput.addEventListener('input', (e) => {
                 clearTimeout(searchTimeout);
                 const term = e.target.value.trim();
                 
                 if (term.length > 2) {
-                    searchBar.classList.add('expanded');
                     showSearchSuggestions(term);
                 } else {
                     suggestions.style.display = 'none';
-                    if (!searchInput.matches(':focus')) {
-                        searchBar.classList.remove('expanded');
-                    }
                 }
+
+                // Auto-search after typing stops (500ms delay)
+                searchTimeout = setTimeout(() => {
+                    if (term.length > 0) {
+                        performSearch(term);
+                    } else {
+                        showInitialState();
+                    }
+                }, 500);
             });
 
             // Enter key handler
@@ -904,7 +732,7 @@
             });
         }
 
-        // Load all products for search
+        // Load all products for search suggestions
         async function loadAllProducts() {
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
@@ -917,12 +745,12 @@
             }
         }
 
-        // Perform search
+        // Perform search with Firebase
         async function performSearch(searchTerm = null) {
             const term = searchTerm || document.getElementById('searchInput').value.trim();
             
             if (!term) {
-                showNoResults("Please enter a search term");
+                showInitialState();
                 return;
             }
 
@@ -930,12 +758,16 @@
             showLoadingState();
 
             try {
-                // Simulate search delay for better UX
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                const q = query(collection(db, "products"), 
-                              where('name', '>=', term),
-                              where('name', '<=', term + '\uf8ff'));
+                // Update URL without page reload
+                const newUrl = `${window.location.pathname}?q=${encodeURIComponent(term)}`;
+                window.history.pushState({}, '', newUrl);
+
+                // Firebase query for search
+                const q = query(
+                    collection(db, "products"),
+                    where('name', '>=', term),
+                    where('name', '<=', term + '\uf8ff')
+                );
                 
                 const querySnapshot = await getDocs(q);
                 
@@ -956,22 +788,18 @@
                 
             } catch (error) {
                 console.error('Error searching products:', error);
-                showNoResults("Error searching products");
+                showNoResults("Error searching products. Please try again.");
             }
         }
 
-        // Display search results
+        // Display search results in grid
         function displaySearchResults(searchTerm) {
             const resultsGrid = document.getElementById('resultsGrid');
             const resultsCount = document.getElementById('resultsCount');
             const pagination = document.getElementById('pagination');
 
             resultsCount.textContent = `${filteredProducts.length} results for "${searchTerm}"`;
-
-            if (filteredProducts.length === 0) {
-                showNoResults(`No results found for "${searchTerm}"`);
-                return;
-            }
+            currentPage = 1; // Reset to first page on new search
 
             // Calculate pagination
             const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -979,24 +807,22 @@
             const endIndex = startIndex + itemsPerPage;
             const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
-            // Display results
-            resultsGrid.innerHTML = currentProducts.map(product => {
+            // Display results with animation
+            resultsGrid.innerHTML = currentProducts.map((product, index) => {
                 const date = product.last_updated?.toDate() || product.created_at.toDate();
-                const imageUrl = product.images?.[0] || 'https://via.placeholder.com/300x200/f5f5f5/666?text=No+Image';
+                const imageUrl = product.images?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/666?text=Digital+Artifact';
                 
                 return `
-                    <div class="archive-item" onclick="viewProduct('${product.id}')">
+                    <div class="archive-item fade-in" style="animation-delay: ${index * 0.1}s" onclick="viewProduct('${product.id}')">
                         <div class="archive-image">
-                            <img src="${imageUrl}" alt="${product.name}">
+                            <img src="${imageUrl}" alt="${product.name}" loading="lazy">
                         </div>
                         <div class="archive-content">
-                            <div class="archive-header">
-                                <div class="archive-title">${product.name}</div>
-                                <div class="archive-description">${product.description}</div>
-                                <div class="archive-meta">
-                                    <span>Added: ${date.toLocaleDateString()}</span>
-                                    <span class="archive-price">${product.price} BTC</span>
-                                </div>
+                            <div class="archive-title">${product.name}</div>
+                            <div class="archive-description">${product.description}</div>
+                            <div class="archive-meta">
+                                <span>${date.toLocaleDateString()}</span>
+                                <span class="archive-price">${product.price} BTC</span>
                             </div>
                             <div class="archive-footer">
                                 <div class="archive-views">
@@ -1014,13 +840,7 @@
             }).join('');
 
             // Update pagination
-            if (totalPages > 1) {
-                document.getElementById('currentPage').textContent = currentPage;
-                document.getElementById('totalPages').textContent = totalPages;
-                pagination.style.display = 'flex';
-            } else {
-                pagination.style.display = 'none';
-            }
+            updatePagination(totalPages);
         }
 
         // Show search suggestions
@@ -1053,51 +873,82 @@
             performSearch();
         }
 
-        // Show loading state
+        // Show loading state with skeleton screens
         function showLoadingState() {
             const resultsGrid = document.getElementById('resultsGrid');
             resultsGrid.innerHTML = `
-                <div class="loading-results" id="loadingResults">
-                    <div class="loading-item">
-                        <div class="loading-image"></div>
-                        <div class="loading-content">
-                            <div class="loading-line" style="width: 70%"></div>
-                            <div class="loading-line medium"></div>
-                            <div class="loading-line short"></div>
+                <div class="loading-results">
+                    ${Array.from({length: 6}, (_, i) => `
+                        <div class="loading-item">
+                            <div class="loading-image"></div>
+                            <div class="loading-content">
+                                <div class="loading-line" style="width: 70%"></div>
+                                <div class="loading-line medium"></div>
+                                <div class="loading-line short"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="loading-item">
-                        <div class="loading-image"></div>
-                        <div class="loading-content">
-                            <div class="loading-line" style="width: 60%"></div>
-                            <div class="loading-line medium"></div>
-                            <div class="loading-line short"></div>
-                        </div>
-                    </div>
+                    `).join('')}
                 </div>
             `;
+        }
+
+        // Show initial state
+        function showInitialState() {
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = `
+                <div class="no-results" id="initialState">
+                    <div class="no-results-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="no-results-title">Search Digital Artifacts</div>
+                    <p>Find HTML templates, code snippets, and digital treasures in our archive</p>
+                </div>
+            `;
+            document.getElementById('resultsCount').textContent = 'Enter your search above';
+            document.getElementById('searchTime').textContent = '';
+            document.getElementById('pagination').style.display = 'none';
         }
 
         // Show no results state
         function showNoResults(message) {
             const resultsGrid = document.getElementById('resultsGrid');
             resultsGrid.innerHTML = `
-                <div class="no-results">
+                <div class="no-results slide-up">
                     <div class="no-results-icon">
                         <i class="fas fa-search"></i>
                     </div>
                     <div class="no-results-title">${message}</div>
-                    <p>Try different keywords or browse our categories</p>
+                    <p>Try different keywords or check the spelling</p>
                     <div class="no-results-suggestions">
+                        <p>Popular searches:</p>
                         <div class="suggestion-list">
-                            <button class="filter-btn" onclick="performSearch('HTML')">HTML Templates</button>
-                            <button class="filter-btn" onclick="performSearch('Code')">Code Snippets</button>
-                            <button class="filter-btn" onclick="performSearch('Design')">Design Systems</button>
+                            <button class="suggestion-btn" onclick="performSearch('HTML template')">HTML Template</button>
+                            <button class="suggestion-btn" onclick="performSearch('CSS design')">CSS Design</button>
+                            <button class="suggestion-btn" onclick="performSearch('JavaScript code')">JavaScript Code</button>
                         </div>
                     </div>
                 </div>
             `;
             document.getElementById('pagination').style.display = 'none';
+        }
+
+        // Update pagination controls
+        function updatePagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+
+            if (totalPages > 1) {
+                document.getElementById('currentPage').textContent = currentPage;
+                document.getElementById('totalPages').textContent = totalPages;
+                
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages;
+                
+                pagination.style.display = 'flex';
+            } else {
+                pagination.style.display = 'none';
+            }
         }
 
         // Pagination
@@ -1108,38 +959,49 @@
             if (currentPage < 1) currentPage = 1;
             if (currentPage > totalPages) currentPage = totalPages;
             
-            displaySearchResults(document.getElementById('searchInput').value);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = currentProducts.map((product, index) => {
+                const date = product.last_updated?.toDate() || product.created_at.toDate();
+                const imageUrl = product.images?.[0] || 'https://via.placeholder.com/400x300/f5f5f5/666?text=Digital+Artifact';
+                
+                return `
+                    <div class="archive-item fade-in" style="animation-delay: ${index * 0.1}s" onclick="viewProduct('${product.id}')">
+                        <div class="archive-image">
+                            <img src="${imageUrl}" alt="${product.name}">
+                        </div>
+                        <div class="archive-content">
+                            <div class="archive-title">${product.name}</div>
+                            <div class="archive-description">${product.description}</div>
+                            <div class="archive-meta">
+                                <span>${date.toLocaleDateString()}</span>
+                                <span class="archive-price">${product.price} BTC</span>
+                            </div>
+                            <div class="archive-footer">
+                                <div class="archive-views">
+                                    <i class="fas fa-eye"></i>
+                                    ${product.views || 0} views
+                                </div>
+                                <button class="download-btn" onclick="event.stopPropagation(); viewProduct('${product.id}')">
+                                    <i class="fas fa-download"></i>
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updatePagination(totalPages);
             
-            // Scroll to top of results
+            // Scroll to top of results smoothly
             document.querySelector('.search-results').scrollIntoView({ 
                 behavior: 'smooth',
                 block: 'start'
             });
-        }
-
-        // Filter and sort functions
-        function filterResults(filter) {
-            // Update active filter button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // In real implementation, this would filter the results
-            console.log(`Filtering by: ${filter}`);
-        }
-
-        function sortResults(sortBy) {
-            console.log(`Sorting by: ${sortBy}`);
-            // Implementation would sort filteredProducts array
-        }
-
-        function applyPriceFilter() {
-            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
-            const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
-            
-            console.log(`Price filter: ${minPrice} - ${maxPrice} BTC`);
-            // Implementation would filter by price range
         }
 
         // Navigation functions
@@ -1169,11 +1031,13 @@
             }
         });
 
-        // Initialize the search page
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadAllProducts();
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', () => {
             initializeSearch();
         });
+
+        // Initialize the search page
+        document.addEventListener('DOMContentLoaded', initializeSearch);
     </script>
 </body>
 </html>
