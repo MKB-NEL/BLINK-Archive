@@ -229,6 +229,37 @@
             color: #666;
         }
 
+        /* Auth Required Section */
+        .auth-required {
+            text-align: center;
+            padding: 30px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            margin-bottom: 20px;
+        }
+
+        .auth-required h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .auth-btn {
+            background: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            background: #333;
+        }
+
         /* Invoice Section */
         .invoice-section {
             border: 2px solid #000000;
@@ -545,7 +576,7 @@
                 </div>
 
                 <div class="action-area" id="actionArea">
-                    <!-- Content will be dynamically populated -->
+                    <!-- Content will be dynamically populated based on auth and order status -->
                 </div>
 
                 <div class="security-badges">
@@ -599,7 +630,7 @@
 
                 <div class="payment-address">
                     <div class="invoice-label">Payment Address</div>
-                    <div class="address" id="paymentAddress">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div>
+                    <div class="address" id="paymentAddress">Loading payment address...</div>
                     <button class="copy-btn" id="copyAddressBtn">
                         <i class="fas fa-copy"></i>
                         Copy Address
@@ -636,7 +667,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where, doc, updateDoc, increment, addDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, where, doc, updateDoc, increment, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBzhfXHrY48d2DhlWwhSTxMHl04USLjtz0",
@@ -649,12 +681,14 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
         // NOWPayments API Configuration
         const NOWPAYMENTS_API_KEY = '2VZM2CZ-S174TD3-K3232BJ-Z8Y9XH0';
         const NOWPAYMENTS_BASE_URL = 'https://api.nowpayments.io/v1';
 
+        let currentUser = null;
         let currentProduct = null;
         let currentOrder = null;
         let paymentCheckInterval = null;
@@ -670,18 +704,71 @@
                 return;
             }
 
-            await loadProduct(productId);
-            setupEventListeners();
-            checkExistingOrder();
+            // Monitor authentication state
+            onAuthStateChanged(auth, async (user) => {
+                currentUser = user;
+                await loadProduct(productId);
+                setupEventListeners();
+                checkExistingOrder();
+            });
         }
 
-        // Check for existing order in localStorage
-        function checkExistingOrder() {
-            const savedOrder = localStorage.getItem(`blink_order_${currentProduct.id}`);
-            if (savedOrder) {
-                currentOrder = JSON.parse(savedOrder);
-                checkOrderStatus(currentOrder.id);
+        // Check for existing order for this user and product
+        async function checkExistingOrder() {
+            if (!currentUser || !currentProduct) return;
+
+            try {
+                const ordersQuery = query(
+                    collection(db, "orders"), 
+                    where("userId", "==", currentUser.uid),
+                    where("productId", "==", currentProduct.id)
+                );
+                
+                const querySnapshot = await getDocs(ordersQuery);
+                
+                if (!querySnapshot.empty) {
+                    const orderDoc = querySnapshot.docs[0];
+                    currentOrder = {
+                        id: orderDoc.id,
+                        ...orderDoc.data()
+                    };
+                    
+                    // Set up real-time listener for order status changes
+                    setupOrderListener(orderDoc.id);
+                    
+                    if (currentOrder.status === 'paid') {
+                        showDownloadSection(currentOrder.downloadLink);
+                    } else {
+                        showInvoiceSection(currentOrder);
+                        startPaymentChecking(currentOrder.paymentId);
+                    }
+                } else {
+                    showPurchaseButton();
+                }
+                
+            } catch (error) {
+                console.error('Error checking existing order:', error);
+                showPurchaseButton();
             }
+        }
+
+        // Set up real-time listener for order status
+        function setupOrderListener(orderId) {
+            const orderRef = doc(db, "orders", orderId);
+            
+            onSnapshot(orderRef, (doc) => {
+                if (doc.exists()) {
+                    const orderData = doc.data();
+                    currentOrder = { id: doc.id, ...orderData };
+                    
+                    if (orderData.status === 'paid') {
+                        if (paymentCheckInterval) {
+                            clearInterval(paymentCheckInterval);
+                        }
+                        showDownloadSection(orderData.downloadLink);
+                    }
+                }
+            });
         }
 
         // Setup event listeners
@@ -713,9 +800,6 @@
                 await updateDoc(doc(db, "products", productId), {
                     views: increment(1)
                 });
-
-                // Show appropriate action based on order status
-                showActionArea();
 
             } catch (error) {
                 console.error('Error loading product:', error);
@@ -795,15 +879,24 @@
             element.classList.add('active');
         }
 
-        // Show appropriate action based on order status
-        function showActionArea() {
+        // Show purchase button or auth required message
+        function showPurchaseButton() {
             const actionArea = document.getElementById('actionArea');
             
-            if (currentOrder) {
-                // Check order status
-                checkOrderStatus(currentOrder.id);
+            if (!currentUser) {
+                // User not logged in
+                actionArea.innerHTML = `
+                    <div class="auth-required">
+                        <h3>Sign In Required</h3>
+                        <p>You need to be signed in to purchase this product</p>
+                        <button class="auth-btn" onclick="redirectToAuth()">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Sign In to Purchase
+                        </button>
+                    </div>
+                `;
             } else {
-                // Show purchase button
+                // User is logged in, show purchase button
                 actionArea.innerHTML = `
                     <button class="purchase-btn" id="purchaseBtn">
                         <i class="fas fa-shopping-cart"></i>
@@ -815,213 +908,188 @@
             }
         }
 
-        // Check order status
-        async function checkOrderStatus(orderId) {
-            try {
-                // In a real implementation, you would check your backend/API
-                // For demo, we'll simulate checking Firebase
-                const ordersQuery = query(collection(db, "orders"), where("id", "==", orderId));
-                const querySnapshot = await getDocs(ordersQuery);
-                
-                if (!querySnapshot.empty) {
-                    const orderDoc = querySnapshot.docs[0];
-                    const orderData = orderDoc.data();
-                    
-                    if (orderData.status === 'paid') {
-                        showDownloadSection(orderData.downloadUrl);
-                    } else {
-                        showInvoiceSection();
-                        startPaymentChecking();
-                    }
-                } else {
-                    // Order not found, show purchase button
-                    showActionArea();
-                }
-                
-            } catch (error) {
-                console.error('Error checking order status:', error);
-                // Fallback to showing purchase button
-                showActionArea();
-            }
-        }
+        // Redirect to auth
+        window.redirectToAuth = function() {
+            window.location.href = 'index.html#auth';
+        };
 
         // Initialize purchase process
         async function initiatePurchase() {
-            if (!currentProduct) return;
+            if (!currentProduct || !currentUser) return;
 
             const purchaseBtn = document.getElementById('purchaseBtn');
             purchaseBtn.disabled = true;
             purchaseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Order...';
 
             try {
-                // Generate unique order ID
-                const orderId = 'BLINK-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                // Create payment through NOWPayments API
+                const payment = await createNowPaymentsPayment();
                 
                 // Create order in Firebase
-                currentOrder = {
-                    id: orderId,
+                const orderData = {
+                    userId: currentUser.uid,
                     productId: currentProduct.id,
                     productName: currentProduct.name,
                     price: currentProduct.price,
                     currency: 'BTC',
-                    status: 'pending',
-                    downloadUrl: currentProduct.download_link,
+                    status: 'unpaid',
+                    paymentId: payment.id,
+                    paymentAddress: payment.pay_address,
+                    payAmount: payment.pay_amount,
                     createdAt: new Date().toISOString(),
-                    userId: getUserId()
+                    downloadLink: currentProduct.download_link // This will be shown only when paid
                 };
 
-                // Save order to Firebase
-                await addDoc(collection(db, "orders"), currentOrder);
+                const docRef = await addDoc(collection(db, "orders"), orderData);
+                
+                currentOrder = {
+                    id: docRef.id,
+                    ...orderData
+                };
 
-                // Save order to localStorage
-                localStorage.setItem(`blink_order_${currentProduct.id}`, JSON.stringify(currentOrder));
-
-                // Create payment invoice
-                await createPaymentInvoice();
+                // Set up real-time listener for this order
+                setupOrderListener(docRef.id);
+                
+                // Show invoice section
+                showInvoiceSection(currentOrder);
+                
+                // Start payment status checking
+                startPaymentChecking(payment.id);
 
             } catch (error) {
                 console.error('Error initiating purchase:', error);
-                alert('Error creating payment invoice. Please try again.');
+                alert('Error creating payment. Please try again.');
                 purchaseBtn.disabled = false;
                 purchaseBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Purchase Now';
             }
         }
 
-        // Create payment invoice using NOWPayments API
-        async function createPaymentInvoice() {
+        // Create payment with NOWPayments API
+        async function createNowPaymentsPayment() {
             try {
-                const invoiceData = {
+                const paymentData = {
                     price_amount: currentProduct.price,
                     price_currency: 'btc',
                     pay_currency: 'btc',
-                    order_id: currentOrder.id,
+                    order_id: `blink-${Date.now()}-${currentProduct.id}`,
                     order_description: currentProduct.name,
-                    ipn_callback_url: 'https://your-domain.com/webhook/nowpayments',
+                    ipn_callback_url: 'https://your-webhook-url.com/nowpayments', // Set your webhook URL
                     success_url: window.location.href,
                     cancel_url: window.location.href
                 };
 
-                const response = await fetch(`${NOWPAYMENTS_BASE_URL}/invoice`, {
+                const response = await fetch(`${NOWPAYMENTS_BASE_URL}/payment`, {
                     method: 'POST',
                     headers: {
                         'x-api-key': NOWPAYMENTS_API_KEY,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(invoiceData)
+                    body: JSON.stringify(paymentData)
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to create invoice');
+                    const errorText = await response.text();
+                    throw new Error(`NOWPayments API error: ${errorText}`);
                 }
 
-                const invoice = await response.json();
-                
-                // Display invoice to user
-                displayInvoice(invoice);
+                const payment = await response.json();
+                return payment;
 
             } catch (error) {
-                console.error('Error creating invoice:', error);
-                // Fallback: Create mock invoice for demo
-                createMockInvoice();
+                console.error('Error creating NOWPayments payment:', error);
+                // Fallback: Create mock payment for demo
+                return createMockPayment();
             }
         }
 
-        // Create mock invoice for demo purposes
-        function createMockInvoice() {
-            const mockInvoice = {
-                id: 'INV-' + Date.now(),
+        // Create mock payment for demo purposes
+        function createMockPayment() {
+            return {
+                id: 'mock-' + Date.now(),
                 pay_address: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
                 pay_amount: currentProduct.price.toFixed(8),
-                order_id: currentOrder.id,
-                invoice_url: '#'
+                order_id: `blink-${Date.now()}-${currentProduct.id}`
             };
-
-            displayInvoice(mockInvoice);
-            startPaymentChecking();
         }
 
-        // Display invoice to user
-        function displayInvoice(invoice) {
+        // Show invoice section
+        function showInvoiceSection(order) {
             // Hide purchase section, show invoice section
             document.querySelector('.purchase-section').style.display = 'none';
             document.getElementById('invoiceSection').style.display = 'block';
 
             // Populate invoice details
-            document.getElementById('invoiceProduct').textContent = currentProduct.name;
-            document.getElementById('invoiceOrderId').textContent = invoice.order_id;
-            document.getElementById('invoiceAmount').textContent = invoice.pay_amount + ' BTC';
-            document.getElementById('paymentAddress').textContent = invoice.pay_address;
+            document.getElementById('invoiceProduct').textContent = order.productName;
+            document.getElementById('invoiceOrderId').textContent = order.paymentId;
+            document.getElementById('invoiceAmount').textContent = order.payAmount + ' BTC';
+            document.getElementById('paymentAddress').textContent = order.paymentAddress;
 
-            // Generate QR code
+            // Generate QR code (simplified for demo)
             const qrCodeElement = document.getElementById('qrCode');
             qrCodeElement.innerHTML = `
                 <div style="text-align: center;">
                     <div style="font-family: monospace; font-size: 12px; margin-bottom: 10px;">BITCOIN PAYMENT</div>
-                    <div style="font-family: monospace; font-size: 10px; word-break: break-all;">${invoice.pay_address}</div>
-                    <div style="margin-top: 10px; font-weight: bold;">${invoice.pay_amount} BTC</div>
+                    <div style="font-family: monospace; font-size: 10px; word-break: break-all;">${order.paymentAddress}</div>
+                    <div style="margin-top: 10px; font-weight: bold;">${order.payAmount} BTC</div>
                 </div>
             `;
-
-            // Start payment status checking
-            startPaymentChecking();
         }
 
-        // Start checking payment status
-        function startPaymentChecking() {
+        // Start checking payment status with NOWPayments API
+        function startPaymentChecking(paymentId) {
             paymentCheckInterval = setInterval(async () => {
-                await checkPaymentStatus();
-            }, 10000); // Check every 10 seconds
+                await checkNowPaymentsStatus(paymentId);
+            }, 15000); // Check every 15 seconds
 
             // Initial check
-            checkPaymentStatus();
+            checkNowPaymentsStatus(paymentId);
         }
 
-        // Check payment status - FIXED VERSION
-        async function checkPaymentStatus() {
-            if (!currentOrder) return;
-
+        // Check payment status with NOWPayments API
+        async function checkNowPaymentsStatus(paymentId) {
             try {
-                // In production, you would check with NOWPayments API or your backend
-                // For demo, we'll simulate payment confirmation after 30 seconds
-                const orderAge = Date.now() - new Date(currentOrder.createdAt).getTime();
-                
-                if (orderAge > 30000) { // 30 seconds for demo
-                    await confirmPayment();
-                }
+                const response = await fetch(`${NOWPAYMENTS_BASE_URL}/payment/${paymentId}`, {
+                    headers: {
+                        'x-api-key': NOWPAYMENTS_API_KEY
+                    }
+                });
 
+                if (response.ok) {
+                    const paymentStatus = await response.json();
+                    
+                    if (paymentStatus.payment_status === 'finished' || paymentStatus.payment_status === 'confirmed') {
+                        await confirmPayment();
+                    }
+                }
             } catch (error) {
                 console.error('Error checking payment status:', error);
+                // For demo purposes, simulate payment confirmation after 60 seconds
+                if (Date.now() - new Date(currentOrder.createdAt).getTime() > 60000) {
+                    await confirmPayment();
+                }
             }
         }
 
-        // Confirm payment and provide download
+        // Confirm payment and update order
         async function confirmPayment() {
             if (!currentOrder) return;
 
             try {
                 // Update order status in Firebase
-                const ordersQuery = query(collection(db, "orders"), where("id", "==", currentOrder.id));
-                const querySnapshot = await getDocs(ordersQuery);
-                
-                if (!querySnapshot.empty) {
-                    const orderDoc = querySnapshot.docs[0];
-                    await updateDoc(doc(db, "orders", orderDoc.id), {
-                        status: 'paid',
-                        paidAt: new Date().toISOString()
-                    });
+                await updateDoc(doc(db, "orders", currentOrder.id), {
+                    status: 'paid',
+                    paidAt: new Date().toISOString()
+                });
 
-                    // Update local order
-                    currentOrder.status = 'paid';
-                    localStorage.setItem(`blink_order_${currentProduct.id}`, JSON.stringify(currentOrder));
-                }
+                // Update local order
+                currentOrder.status = 'paid';
 
                 // Stop payment checking
                 if (paymentCheckInterval) {
                     clearInterval(paymentCheckInterval);
                 }
 
-                // Show download section
-                showDownloadSection(currentOrder.downloadUrl);
+                // The download section will be shown automatically via the real-time listener
 
             } catch (error) {
                 console.error('Error confirming payment:', error);
@@ -1044,20 +1112,21 @@
             const address = document.getElementById('paymentAddress').textContent;
             try {
                 await navigator.clipboard.writeText(address);
-                alert('Address copied to clipboard!');
+                
+                const copyBtn = document.getElementById('copyAddressBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.style.background = '#00a000';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.style.background = '';
+                }, 2000);
+                
             } catch (error) {
                 console.error('Failed to copy address:', error);
+                alert('Failed to copy address. Please copy manually.');
             }
-        }
-
-        // Get user ID from localStorage or generate one
-        function getUserId() {
-            let userId = localStorage.getItem('blink_user_id');
-            if (!userId) {
-                userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('blink_user_id', userId);
-            }
-            return userId;
         }
 
         // Navigation functions
